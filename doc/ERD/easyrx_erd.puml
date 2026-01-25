@@ -1,0 +1,395 @@
+@startuml
+hide circle
+skinparam linetype ortho
+
+entity "companies" as companies {
+  *id : uuid <<PK>>
+  --
+  company_code : text <<UQ>>
+  name : text
+  timezone : text
+  created_at : timestamptz
+}
+
+entity "branches" as branches {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  code : text <<UQ(company)>>
+  name : text
+  is_active : bool
+}
+
+entity "terminals" as terminals {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  terminal_code : text <<UQ(branch)>>
+  is_authorized : bool
+}
+
+entity "users" as users {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK nullable>>
+  username : text <<UQ(company)>>
+  email : text
+  password_hash : text
+  is_active : bool
+  is_locked : bool
+}
+
+entity "roles" as roles {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  name : text
+  is_system : bool
+}
+
+entity "user_roles" as user_roles {
+  *user_id : uuid <<PK,FK>>
+  *role_id : uuid <<PK,FK>>
+}
+
+entity "products" as products {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  brand_name : text
+  generic_name : text
+  strength : text
+  dosage_form : text
+  manufacturer : text
+  is_medicine : bool
+  is_controlled : bool
+  is_cold_chain : bool
+  sale_unit : text
+  purchase_unit : text
+  pack_json : jsonb
+}
+
+entity "product_barcodes" as product_barcodes {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  barcode : text <<UQ(company)>>
+  type : text
+}
+
+entity "suppliers" as suppliers {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  name : text
+  phone : text
+}
+
+entity "customers" as customers {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  full_name : text
+  phone : text
+}
+
+entity "patients" as patients {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  full_name : text
+  phone : text
+  dob : date
+}
+
+entity "batches" as batches {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  batch_no : text
+  expiry_date : date
+}
+
+entity "inventory_ledger_lines" as inventory_ledger_lines {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  batch_id : uuid <<FK>>
+  movement_type : text
+  qty_in : numeric
+  qty_out : numeric
+  unit_cost : numeric
+  unit_price : numeric
+  source_doc_type : text
+  source_doc_id : uuid
+  created_by : uuid <<FK>>
+  posted_at : timestamptz
+}
+
+entity "purchase_orders" as purchase_orders {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  supplier_id : uuid <<FK>>
+  status : text
+}
+
+entity "purchase_order_lines" as purchase_order_lines {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  purchase_order_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  ordered_qty : numeric
+}
+
+entity "grn_receipts" as grn_receipts {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  supplier_id : uuid <<FK>>
+  purchase_order_id : uuid <<FK nullable>>
+  supplier_invoice_no : text
+  status : text
+  idempotency_key : text <<UQ(company) nullable>>
+  posted_at : timestamptz
+}
+
+entity "grn_lines" as grn_lines {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  grn_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  batch_id : uuid <<FK>>
+  received_qty : numeric
+  unit_cost : numeric
+}
+
+entity "sales_invoices" as sales_invoices {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  terminal_id : uuid <<FK nullable>>
+  invoice_no : text
+  status : text
+  customer_id : uuid <<FK nullable>>
+  patient_id : uuid <<FK nullable>>
+  net_total : numeric
+  idempotency_key : text <<UQ(company) nullable>>
+  posted_at : timestamptz
+}
+
+entity "sales_invoice_lines" as sales_invoice_lines {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  sales_invoice_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  batch_id : uuid <<FK>>
+  qty : numeric
+  unit_price : numeric
+}
+
+entity "payments" as payments {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  sales_invoice_id : uuid <<FK>>
+  method : text
+  amount : numeric
+  paid_at : timestamptz
+}
+
+entity "prescriptions" as prescriptions {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  patient_id : uuid <<FK>>
+  status : text
+  dispensed_at : timestamptz
+}
+
+entity "prescription_lines" as prescription_lines {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  prescription_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  batch_id : uuid <<FK nullable>>
+  qty : numeric
+  sig : text
+}
+
+entity "controlled_drug_register" as controlled_drug_register {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  prescription_id : uuid <<FK nullable>>
+  product_id : uuid <<FK>>
+  qty : numeric
+  logged_by : uuid <<FK>>
+  logged_at : timestamptz
+}
+
+entity "transfers" as transfers {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  from_branch_id : uuid <<FK>>
+  to_branch_id : uuid <<FK>>
+  status : text
+  idempotency_key : text <<UQ(company) nullable>>
+}
+
+entity "transfer_lines" as transfer_lines {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  transfer_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  batch_id : uuid <<FK>>
+  qty : numeric
+}
+
+entity "chart_of_accounts" as chart_of_accounts {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  code : text <<UQ(company)>>
+  name : text
+  type : text
+}
+
+entity "journal_entries" as journal_entries {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK nullable>>
+  source_doc_type : text
+  source_doc_id : uuid
+  status : text
+  entry_date : date
+}
+
+entity "journal_lines" as journal_lines {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  journal_entry_id : uuid <<FK>>
+  account_id : uuid <<FK>>
+  debit : numeric
+  credit : numeric
+}
+
+entity "document_uploads" as document_uploads {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  uploaded_by : uuid <<FK>>
+  doc_type : text
+  file_url : text
+  status : text
+}
+
+entity "ai_extractions" as ai_extractions {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  document_upload_id : uuid <<FK>>
+  raw_json : jsonb
+  confidence_json : jsonb
+}
+
+entity "ai_review_events" as ai_review_events {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  document_upload_id : uuid <<FK>>
+  reviewed_by : uuid <<FK>>
+  action : text
+  notes : text
+}
+
+entity "sync_inbox" as sync_inbox {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK>>
+  terminal_id : uuid <<FK nullable>>
+  doc_type : text
+  idempotency_key : text <<UQ(company)>>
+  payload_hash : text
+  status : text
+  cloud_doc_id : uuid
+}
+
+entity "audit_logs" as audit_logs {
+  *id : uuid <<PK>>
+  --
+  company_id : uuid <<FK>>
+  branch_id : uuid <<FK nullable>>
+  actor_user_id : uuid <<FK>>
+  action : text
+  entity_type : text
+  entity_id : uuid
+  before_json : jsonb
+  after_json : jsonb
+  created_at : timestamptz
+}
+
+' Relationships
+companies ||--o{ branches
+branches  ||--o{ terminals
+companies ||--o{ users
+users     ||--o{ user_roles
+roles     ||--o{ user_roles
+
+companies ||--o{ products
+products  ||--o{ product_barcodes
+companies ||--o{ suppliers
+companies ||--o{ customers
+companies ||--o{ patients
+
+products  ||--o{ batches
+batches   ||--o{ inventory_ledger_lines
+branches  ||--o{ inventory_ledger_lines
+users     ||--o{ inventory_ledger_lines
+
+suppliers ||--o{ purchase_orders
+purchase_orders ||--o{ purchase_order_lines
+suppliers ||--o{ grn_receipts
+grn_receipts ||--o{ grn_lines
+
+branches  ||--o{ sales_invoices
+sales_invoices ||--o{ sales_invoice_lines
+sales_invoices ||--o{ payments
+patients  ||--o{ prescriptions
+prescriptions ||--o{ prescription_lines
+prescriptions ||--o{ controlled_drug_register
+
+transfers ||--o{ transfer_lines
+
+companies ||--o{ chart_of_accounts
+journal_entries ||--o{ journal_lines
+chart_of_accounts ||--o{ journal_lines
+
+document_uploads ||--o{ ai_extractions
+document_uploads ||--o{ ai_review_events
+
+companies ||--o{ sync_inbox
+companies ||--o{ audit_logs
+
+@enduml
