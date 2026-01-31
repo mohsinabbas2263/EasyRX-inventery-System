@@ -1,7 +1,8 @@
 import { Controller, Get, Body, Patch, Param, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { RequirePermissions, PermissionCode } from '../../common/decorators/permissions.decorator';
-import { AuditAction } from '../../common/decorators/audit-action.decorator';
+import { RequirePermissions, PermissionCode } from '../security/decorators/permissions.decorator';
+import { AuditAction } from '../security/interceptors/audit.interceptor';
+import { UserQueryDto } from './dto/user-query.dto';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -9,7 +10,7 @@ export class UsersController {
 
     @Get()
     @RequirePermissions(PermissionCode.USER_MANAGE)
-    findAll(@Query() query: any) {
+    findAll(@Query() query: UserQueryDto) {
         return this.usersService.findAll(query.branchId);
     }
 

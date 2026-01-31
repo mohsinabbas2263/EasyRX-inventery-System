@@ -16,7 +16,7 @@ export class MovementService {
         private productRepository: Repository<Product>,
         private stockService: StockService,
         private dataSource: DataSource,
-    ) {}
+    ) { }
 
     async createMovement(dto: CreateMovementDto, currentUserId: string): Promise<InventoryLedger[]> {
         // Validate movement type
@@ -38,7 +38,7 @@ export class MovementService {
         const isOutbound = outboundTypes.includes(dto.movementType);
 
         // Validate product exists
-        const product = await this.productRepository.findOne({ where: { id: dto.productId } });
+        const product = await this.productRepository.findOne({ where: { productId: dto.productId } });
         if (!product) {
             throw new BadRequestException(`Product ${dto.productId} not found`);
         }

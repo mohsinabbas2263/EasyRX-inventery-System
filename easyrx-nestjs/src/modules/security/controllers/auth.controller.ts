@@ -1,11 +1,12 @@
-import { Controller, Post, Body, Request, UseGuards, Throttle } from '@nestjs/common';
+import { Controller, Post, Body, Request, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from '../services/auth.service';
 import { LoginDto, LoginResponseDto } from '../dto/login.dto';
 import { Public } from '../guards/jwt-auth.guard';
 
 @Controller('api/v1/auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService) { }
 
     @Public()
     @Post('login')

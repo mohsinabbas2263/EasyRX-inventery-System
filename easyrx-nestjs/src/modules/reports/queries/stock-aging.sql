@@ -39,7 +39,7 @@ SELECT
         ELSE 'DEAD'
     END as movement_type
 FROM current_stock cs
-JOIN products p ON cs.product_id = p.id
+JOIN products p ON cs.product_id = p.product_id
 LEFT JOIN movement_stats ms ON cs.product_id = ms.product_id
 WHERE (cs.last_movement_date <= CURRENT_DATE - INTERVAL :minDaysStagnant DAYS 
     OR ms.daily_velocity < 0.1)

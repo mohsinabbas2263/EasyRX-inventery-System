@@ -21,8 +21,8 @@ WHERE
     AND (:branchId::uuid IS NULL OR si.branch_id = :branchId::uuid)
     AND (:category::text IS NULL OR EXISTS (
         SELECT 1 FROM products p 
-        WHERE p.id = sil.product_id 
-        AND p.category = :category
+        WHERE p.product_id = sil.product_id 
+        AND p.category_id::text = :category
     ))
 GROUP BY DATE_TRUNC(:groupBy::text, si.posted_at)
 ORDER BY period_date DESC;

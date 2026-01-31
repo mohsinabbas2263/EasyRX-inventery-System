@@ -11,7 +11,6 @@ import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { PurchaseModule } from './modules/purchase/purchase.module';
-import { AuditModule } from './modules/audit/audit.module';
 import { HealthController } from './health.controller';
 import { JwtAuthGuard } from './modules/security/guards/jwt-auth.guard';
 import { AuditInterceptor } from './modules/security/interceptors/audit.interceptor';
@@ -60,8 +59,7 @@ import { AuditInterceptor } from './modules/security/interceptors/audit.intercep
             },
         ]),
         // Core modules
-        SecurityModule,
-        AuditModule,
+        SecurityModule, // Includes Audit and Permissions functionality
         UsersModule,
         ProductsModule,
         // Feature modules

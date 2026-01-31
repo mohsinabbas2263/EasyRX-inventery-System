@@ -24,7 +24,7 @@ import { SupplierReportQueryDto, StaffProductivityQueryDto } from './dto/supplie
 @Controller('api/v1/reports')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ReportsController {
-    constructor(private reportsService: ReportsService) {}
+    constructor(private reportsService: ReportsService) { }
 
     @Get('sales')
     @RequirePermissions(PermissionCode.REPORT_FINANCIAL)
@@ -115,7 +115,7 @@ export class ReportsController {
         @Query('format') format: ExportFormat = ExportFormat.CSV,
         @Query() queryParams: any,
         @Request() req,
-        @Res() res: Response,
+        @Res({ passthrough: false }) res: Response,
     ) {
         if (!['sales', 'expiry', 'aging', 'supplier', 'productivity'].includes(type)) {
             throw new BadRequestException('Invalid report type');

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CacheModule } from '@nestjs/cache-manager';
+// import { CacheModule } from '@nestjs/cache-manager';
 import { StockController } from './controllers/stock.controller';
 import { MovementController } from './controllers/movement.controller';
 import { ConfigController } from './controllers/config.controller';
@@ -24,13 +24,13 @@ import { ProductBatch } from '../products/entities/product-batch.entity';
             Product,
             ProductBatch,
         ]),
-        CacheModule.register({
-            ttl: 5 * 60 * 1000, // 5 minutes
-            max: 500,
-        }),
+        // CacheModule.register({
+        //     ttl: 5 * 60 * 1000, // 5 minutes
+        //     max: 500,
+        // }),
     ],
     controllers: [StockController, MovementController, ConfigController],
     providers: [StockService, MovementService, InventoryConfigService],
     exports: [StockService, MovementService, InventoryConfigService],
 })
-export class InventoryModule {}
+export class InventoryModule { }

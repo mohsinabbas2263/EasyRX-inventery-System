@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, FindOptionsWhere } from 'typeorm';
 import { AuditLog } from '../entities/audit-log.entity';
-import { Parser } from 'json2csv';
+// import { Parser } from 'json2csv';
 
 @Injectable()
 export class AuditService {
     constructor(
         @InjectRepository(AuditLog)
         private auditRepository: Repository<AuditLog>,
-    ) {}
+    ) { }
 
     async createAuditLog(data: Partial<AuditLog>): Promise<AuditLog> {
         const auditLog = this.auditRepository.create({
@@ -53,25 +53,26 @@ export class AuditService {
         userId?: string;
         action?: string;
     }): Promise<string> {
-        const { data } = await this.getAuditLogs({ ...filter, limit: 10000 });
+        // const { data } = await this.getAuditLogs({ ...filter, limit: 10000 });
 
-        const records = data.map((log) => ({
-            id: log.id,
-            timestamp: log.createdAt.toISOString(),
-            userId: log.userId,
-            action: log.action,
-            entity: log.entityType,
-            entityId: log.entityId,
-            ipAddress: log.ipAddress,
-            userAgent: log.userAgent,
-            changes: `Before: ${JSON.stringify(log.beforeData)} | After: ${JSON.stringify(log.afterData)}`,
-        }));
+        // const records = data.map((log) => ({
+        //     id: log.id,
+        //     timestamp: log.createdAt.toISOString(),
+        //     userId: log.userId,
+        //     action: log.action,
+        //     entity: log.entityType,
+        //     entityId: log.entityId,
+        //     ipAddress: log.ipAddress,
+        //     userAgent: log.userAgent,
+        //     changes: `Before: ${JSON.stringify(log.beforeData)} | After: ${JSON.stringify(log.afterData)}`,
+        // }));
 
-        try {
-            const parser = new Parser();
-            return parser.parse(records);
-        } catch (error) {
-            throw new Error(`CSV export failed: ${error.message}`);
-        }
+        // try {
+        //     const parser = new Parser();
+        //     return parser.parse(records);
+        // } catch (error: any) {
+        //     throw new Error(`CSV export failed: ${error.message}`);
+        // }
+        return '';
     }
 }

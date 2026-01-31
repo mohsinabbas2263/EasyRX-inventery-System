@@ -10,7 +10,7 @@ WITH current_stock AS (
     HAVING SUM(CASE WHEN movement_type IN ('GRN', 'RETURN') THEN qty_in - qty_out ELSE -qty_out END) > 0
 )
 SELECT
-    p.id as product_id,
+    p.product_id as product_id,
     p.brand_name as product_name,
     pb.batch_no,
     pb.expiry_date,
@@ -23,8 +23,8 @@ SELECT
         ELSE 'NORMAL'
     END as risk_level
 FROM current_stock cs
-JOIN products p ON cs.product_id = p.id
-JOIN product_batches pb ON cs.batch_id = pb.id
+JOIN products p ON cs.product_id = p.product_id
+JOIN product_batches pb ON cs.batch_id = pb.batch_id
 WHERE pb.expiry_date <= CURRENT_DATE + INTERVAL :daysThreshold DAYS
 ORDER BY days_to_expiry ASC
 LIMIT :limit OFFSET :offset;

@@ -16,7 +16,7 @@ WITH grn_metrics AS (
             2
         ) as fill_rate
     FROM grn_headers gh
-    LEFT JOIN purchase_invoice_lines pil ON gh.grn_id = pil.grn_id
+    LEFT JOIN grn_lines gl ON gh.grn_id = gl.grn_id
     WHERE 
         gh.posted_at >= :fromDate
         AND gh.posted_at < :toDate

@@ -32,3 +32,9 @@ coverage/
 # Misc
 .cache/
 temp/
+
+# Temporary and debug files
+*.tmp
+*.temp
+build_*.txt
+debug_*.log

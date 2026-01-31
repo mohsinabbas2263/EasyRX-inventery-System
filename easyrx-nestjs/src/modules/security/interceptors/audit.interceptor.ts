@@ -13,7 +13,7 @@ export class AuditInterceptor implements NestInterceptor {
     constructor(
         @Inject(AuditService) private auditService: AuditService,
         private reflector: Reflector,
-    ) {}
+    ) { }
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const request = context.switchToHttp().getRequest<Request>();
@@ -42,7 +42,7 @@ export class AuditInterceptor implements NestInterceptor {
                         afterData: this.sanitizeBody(data),
                         ipAddress: this.getClientIp(request),
                         userAgent: request.get('user-agent'),
-                        requestId: request.id || request.headers['x-request-id'] as string,
+                        requestId: (request as any).id || (Array.isArray(request.headers['x-request-id']) ? request.headers['x-request-id'][0] : request.headers['x-request-id']),
                     });
                 },
                 async (error) => {
@@ -57,7 +57,7 @@ export class AuditInterceptor implements NestInterceptor {
                         afterData: { error: error.message },
                         ipAddress: this.getClientIp(request),
                         userAgent: request.get('user-agent'),
-                        requestId: request.id || request.headers['x-request-id'] as string,
+                        requestId: (request as any).id || (Array.isArray(request.headers['x-request-id']) ? request.headers['x-request-id'][0] : request.headers['x-request-id']),
                     });
                 },
             ),

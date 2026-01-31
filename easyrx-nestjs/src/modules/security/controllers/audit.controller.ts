@@ -9,7 +9,7 @@ import { Response } from 'express';
 @Controller('api/v1/audit')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class AuditController {
-    constructor(private auditService: AuditService) {}
+    constructor(private auditService: AuditService) { }
 
     @Get()
     @RequirePermissions(PermissionCode.AUDIT_VIEW)
@@ -36,11 +36,11 @@ export class AuditController {
     @RequirePermissions(PermissionCode.AUDIT_EXPORT)
     @AuditAction('AUDIT:EXPORT')
     async exportAuditCsv(
-        @Query('from') from?: string,
-        @Query('to') to?: string,
-        @Query('userId') userId?: string,
-        @Query('action') action?: string,
-        @Res() res: Response,
+        @Query('from') from: string,
+        @Query('to') to: string,
+        @Query('userId') userId: string,
+        @Query('action') action: string,
+        @Res({ passthrough: false }) res: Response,
     ) {
         const csv = await this.auditService.exportAuditCsv({
             from: from ? new Date(from) : undefined,

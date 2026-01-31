@@ -7,7 +7,6 @@ import { AuthService } from './services/auth.service';
 import { PermissionsService } from './services/permissions.service';
 import { AuditService } from './services/audit.service';
 import { AuthController } from './controllers/auth.controller';
-import { UsersController } from './controllers/users.controller';
 import { PermissionsController } from './controllers/permissions.controller';
 import { AuditController } from './controllers/audit.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -32,7 +31,7 @@ import { User } from '../users/entities/user.entity';
         }),
         TypeOrmModule.forFeature([AuditLog, UserPermission, User]),
     ],
-    controllers: [AuthController, UsersController, PermissionsController, AuditController],
+    controllers: [AuthController, PermissionsController, AuditController],
     providers: [
         AuthService,
         PermissionsService,
@@ -44,4 +43,4 @@ import { User } from '../users/entities/user.entity';
     ],
     exports: [AuthService, PermissionsService, AuditService, JwtAuthGuard, PermissionsGuard],
 })
-export class SecurityModule {}
+export class SecurityModule { }

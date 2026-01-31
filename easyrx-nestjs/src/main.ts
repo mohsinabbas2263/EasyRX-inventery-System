@@ -1,10 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 // import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+    const logger = new Logger('Bootstrap');
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
 
@@ -34,11 +35,11 @@ async function bootstrap() {
 
     const port = configService.get('PORT', 3000);
     await app.listen(port);
-    console.log(`✓ EazyRX Backend running on port ${port}`);
-    console.log(`✓ Environment: ${configService.get('NODE_ENV', 'development')}`);
+    logger.log(`✓ EazyRX Backend running on port ${port}`);
+    logger.log(`✓ Environment: ${configService.get('NODE_ENV', 'development')}`);
 }
 
 bootstrap().catch((err) => {
-    console.error('Bootstrap failed:', err);
+    new Logger('Bootstrap').error('Bootstrap failed:', err);
     process.exit(1);
 });
