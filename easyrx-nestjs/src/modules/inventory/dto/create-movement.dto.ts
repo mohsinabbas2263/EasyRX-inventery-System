@@ -6,6 +6,7 @@ import {
     IsOptional,
     ValidateIf,
     IsString,
+    IsBoolean,
 } from 'class-validator';
 import { MovementType, AdjustmentReason, ReferenceDocType } from '../entities/inventory-ledger.entity';
 
@@ -50,5 +51,3 @@ export class CreateMovementDto {
     @IsOptional()
     allowNegativeStock?: boolean = false;
 }
-
-import { IsBoolean } from 'class-validator';

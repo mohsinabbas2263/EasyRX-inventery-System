@@ -9,7 +9,7 @@ export class SalesInvoiceLine {
     @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
-    @RelationId((line) => line.salesInvoice)
+    @RelationId((line: SalesInvoiceLine) => line.salesInvoice)
     saleId: string;
 
     @Column({ name: 'product_id', type: 'uuid' })

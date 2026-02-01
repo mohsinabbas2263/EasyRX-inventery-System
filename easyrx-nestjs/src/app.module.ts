@@ -41,23 +41,16 @@ import { AuditInterceptor } from './modules/security/interceptors/audit.intercep
         //     ttl: 5 * 60 * 1000, // 5 minutes default
         //     max: 1000,
         // }),
-        ThrottlerModule.forRoot([
-            {
-                name: 'short',
-                ttl: 1000,
-                limit: 3,
-            },
-            {
-                name: 'medium',
-                ttl: 15000,
-                limit: 5,
-            },
-            {
-                name: 'long',
-                ttl: 60000,
-                limit: 100,
-            },
-        ]),
+        ThrottlerModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => [
+                {
+                    ttl: configService.get<number>('THROTTLE_TTL', 60),
+                    limit: configService.get<number>('THROTTLE_LIMIT', 10),
+                },
+            ],
+        }),
         // Core modules
         SecurityModule, // Includes Audit and Permissions functionality
         UsersModule,

@@ -1,4 +1,4 @@
-import { IsEnum, IsUUID } from 'class-validator';
+import { IsEnum, IsUUID, IsString } from 'class-validator';
 import { UserRole } from '../decorators/permissions.decorator';
 
 export class ChangeRoleDto {
@@ -13,5 +13,3 @@ export class AssignPermissionsDto {
     @IsString({ each: true })
     permissionCodes: string[];
 }
-
-import { IsString } from 'class-validator';

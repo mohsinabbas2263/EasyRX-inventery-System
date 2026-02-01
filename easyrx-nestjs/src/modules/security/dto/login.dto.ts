@@ -1,19 +1,36 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginDto {
-    @IsEmail()
-    email: string;
-
+    @ApiProperty({ example: 'admin', description: 'Username' })
     @IsString()
-    @MinLength(8, { message: 'Password must be at least 8 characters' })
+    @IsNotEmpty()
+    @MaxLength(100)
+    username: string;
+
+    @ApiProperty({ example: 'password123', description: 'Password' })
+    @IsString()
+    @IsNotEmpty()
+    @MinLength(8)
     password: string;
 }
 
+export class RefreshTokenDto {
+    @ApiProperty({ description: 'Refresh token' })
+    @IsString()
+    @IsNotEmpty()
+    refreshToken: string;
+}
+
 export class LoginResponseDto {
+    @ApiProperty()
     accessToken: string;
+
+    @ApiProperty()
     refreshToken: string;
     user: {
         userId: string;
+        username: string;
         email: string;
         role: string;
         branchId: string;

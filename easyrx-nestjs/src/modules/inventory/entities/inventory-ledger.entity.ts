@@ -3,94 +3,49 @@ import {
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
-    ManyToOne,
-    JoinColumn,
     Index,
 } from 'typeorm';
-import { Product } from '../../products/entities/product.entity';
-import { ProductBatch } from '../../products/entities/product-batch.entity';
-
-export enum MovementType {
-    PURCHASE = 'PURCHASE',
-    SALE = 'SALE',
-    RETURN_IN = 'RETURN_IN',
-    RETURN_OUT = 'RETURN_OUT',
-    TRANSFER_IN = 'TRANSFER_IN',
-    TRANSFER_OUT = 'TRANSFER_OUT',
-    ADJUSTMENT = 'ADJUSTMENT',
-    COUNT = 'COUNT',
-}
-
-export enum AdjustmentReason {
-    DAMAGED = 'DAMAGED',
-    EXPIRED = 'EXPIRED',
-    SHRINKAGE = 'SHRINKAGE',
-    CYCLE_COUNT = 'CYCLE_COUNT',
-    THEFT = 'THEFT',
-    OTHER = 'OTHER',
-}
-
-export enum ReferenceDocType {
-    GRN = 'GRN',
-    SALE = 'SALE',
-    TRANSFER = 'TRANSFER',
-    ADJUSTMENT = 'ADJUSTMENT',
-    COUNT = 'COUNT',
-}
 
 @Entity('inventory_ledger')
-@Index('idx_inventory_branch_product_batch', ['branchId', 'productId', 'batchId'])
-@Index('idx_inventory_branch_posted', ['branchId', 'postedAt'])
-@Index('idx_inventory_product_batch', ['productId', 'batchId'])
-@Index('idx_inventory_batch_expiry', ['batchId', 'postedAt'])
+@Index(['productId', 'batchId', 'branchId'])
+@Index(['branchId', 'postedAt'])
 export class InventoryLedger {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn('uuid', { name: 'ledger_id' })
+    ledgerId!: string;
 
-    @Column({ type: 'uuid' })
-    branchId: string;
+    @Column({ name: 'branch_id', type: 'uuid' })
+    branchId!: string;
 
-    @Column({ type: 'uuid' })
-    productId: string;
+    @Column({ name: 'product_id', type: 'uuid' })
+    productId!: string;
 
-    @Column({ type: 'uuid', nullable: true })
-    batchId: string;
+    @Column({ name: 'batch_id', type: 'uuid' })
+    batchId!: string;
 
-    @Column({ type: 'uuid', nullable: true })
-    binId: string;
+    @Column({ name: 'document_type', length: 50 })
+    documentType!: string; // 'SALE', 'PURCHASE', 'ADJUSTMENT', 'TRANSFER_IN', 'TRANSFER_OUT'
 
-    @Column({ type: 'varchar', length: 50 })
-    movementType: MovementType;
+    @Column({ name: 'document_id', type: 'uuid' })
+    documentId!: string;
 
-    @Column({ type: 'numeric', precision: 14, scale: 3, default: 0 })
-    qtyIn: number;
+    @Column({ name: 'qty_in', type: 'decimal', precision: 10, scale: 2, default: 0 })
+    qtyIn!: number;
 
-    @Column({ type: 'numeric', precision: 14, scale: 3, default: 0 })
-    qtyOut: number;
+    @Column({ name: 'qty_out', type: 'decimal', precision: 10, scale: 2, default: 0 })
+    qtyOut!: number;
 
-    @Column({ type: 'varchar', length: 100, nullable: true })
-    reason: AdjustmentReason | null;
+    @Column({ name: 'unit_cost', type: 'decimal', precision: 10, scale: 2, nullable: true })
+    unitCost!: number;
 
-    @Column({ type: 'numeric', precision: 14, scale: 4, nullable: true })
-    unitCost: number | null;
+    @Column({ name: 'posted_at', type: 'timestamp' })
+    postedAt!: Date;
 
-    @Column({ type: 'varchar', length: 50, nullable: true })
-    referenceDocType: ReferenceDocType | null;
+    @Column({ name: 'posted_by', type: 'uuid' })
+    postedBy!: string;
 
-    @Column({ type: 'uuid', nullable: true })
-    referenceDocId: string | null;
+    @Column({ type: 'text', nullable: true })
+    notes!: string;
 
-    @Column({ type: 'uuid', nullable: true })
-    createdBy: string | null;
-
-    @CreateDateColumn()
-    postedAt: Date;
-
-    @ManyToOne(() => Product)
-    @JoinColumn({ name: 'productId' })
-    product: Product;
-
-    @ManyToOne(() => ProductBatch, { nullable: true })
-    @JoinColumn({ name: 'batchId' })
-    batch: ProductBatch;
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt!: Date;
 }

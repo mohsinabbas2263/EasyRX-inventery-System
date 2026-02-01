@@ -17,11 +17,32 @@ export class AuthService {
         private jwtService: JwtService,
         private permissionsService: PermissionsService,
         private auditService: AuditService,
-    ) {}
+    ) { }
+
+    async validateUser(username: string, pass: string): Promise<any> {
+        const user = await this.usersRepository.findOne({
+            where: { username },
+        });
+        if (!user) {
+            return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(pass, user.passwordHash);
+        if (!isPasswordValid) {
+            return null;
+        }
+
+        const { passwordHash, ...result } = user;
+        return result;
+    }
+
+    async hashPassword(password: string): Promise<string> {
+        return bcrypt.hash(password, 12); // Increased rounds to 12
+    }
 
     async login(loginDto: LoginDto, ipAddress: string, userAgent: string) {
         const user = await this.usersRepository.findOne({
-            where: { username: loginDto.email },
+            where: { username: loginDto.username },
         });
 
         if (!user || !(await bcrypt.compare(loginDto.password, user.passwordHash))) {
@@ -29,12 +50,12 @@ export class AuthService {
                 action: 'AUTH:LOGIN_FAILED',
                 entityType: 'user',
                 entityId: user?.userId,
-                beforeData: { email: loginDto.email },
+                beforeData: { username: loginDto.username },
                 afterData: { reason: 'Invalid credentials' },
                 ipAddress,
                 userAgent,
             });
-            throw new UnauthorizedException('Invalid email or password');
+            throw new UnauthorizedException('Invalid username or password');
         }
 
         if (!user.isActive) {
@@ -47,7 +68,7 @@ export class AuthService {
 
         const payload = {
             sub: user.userId,
-            email: user.username,
+            username: user.username,
             branchId: user.branchId,
             companyId: user.companyId,
             role: user.role,
@@ -59,13 +80,13 @@ export class AuthService {
 
         await this.auditService.createAuditLog({
             userId: user.userId,
-            branchId: user.branchId,
+            branchId: user.branchId ?? undefined,
             companyId: user.companyId,
             action: 'AUTH:LOGIN_SUCCESS',
             entityType: 'user',
             entityId: user.userId,
-            beforeData: null,
-            afterData: { email: user.username, role: user.role },
+            beforeData: undefined,
+            afterData: { username: user.username, role: user.role },
             ipAddress,
             userAgent,
         });
@@ -75,7 +96,8 @@ export class AuthService {
             refreshToken,
             user: {
                 userId: user.userId,
-                email: user.username,
+                username: user.username,
+                email: user.username, // Assuming username is email for now or needs to be updated in entity
                 role: user.role,
                 branchId: user.branchId,
                 companyId: user.companyId,
@@ -83,7 +105,7 @@ export class AuthService {
         };
     }
 
-    async validateUser(userId: string): Promise<User> {
+    async validateUserById(userId: string): Promise<User> {
         const user = await this.usersRepository.findOne({
             where: { userId },
         });
