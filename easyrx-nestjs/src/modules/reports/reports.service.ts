@@ -6,7 +6,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 // import { Parser } from 'fast-csv';
 import { CsvUtility } from './utils/csv.utility';
-import { Writable } from 'stream';
 import {
     SalesReportQueryDto,
     SalesReportResponseDto,

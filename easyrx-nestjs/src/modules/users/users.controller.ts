@@ -1,7 +1,7 @@
 import { Controller, Get, Body, Patch, Param, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RequirePermissions, PermissionCode } from '../security/decorators/permissions.decorator';
-import { AuditAction } from '../security/interceptors/audit.interceptor';
+import { AuditAction } from '../security/decorators/audit.decorator';
 import { UserQueryDto } from './dto/user-query.dto';
 
 @Controller('api/v1/users')

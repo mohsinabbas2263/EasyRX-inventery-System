@@ -1,11 +1,11 @@
 import { Controller, Get, Query, UseGuards, Request, BadRequestException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { StockService } from '../services/stock.service';
 import { StockQueryDto } from '../dto/stock-query.dto';
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../security/guards/permissions.guard';
 import { RequirePermissions, PermissionCode } from '../../security/decorators/permissions.decorator';
-import { AuditAction } from '../../security/interceptors/audit.interceptor';
+import { AuditAction } from '../../security/decorators/audit.decorator';
 
 @ApiTags('Inventory')
 @ApiBearerAuth()
@@ -20,7 +20,7 @@ export class StockController {
     @ApiOperation({ summary: 'Get current stock' })
     async getStock(
         @Query() query: StockQueryDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         // Enforce branch scoping
         if (req.user.role !== 'HO_ADMIN' && query.branchId !== req.user.branchId) {
@@ -41,7 +41,7 @@ export class StockController {
     async getNearExpiry(
         @Query('branchId') branchId: string,
         @Query('days') days: number = 90,
-        @Request() req,
+        @Request() req: any,
     ) {
         if (req.user.role !== 'HO_ADMIN' && branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');
@@ -59,7 +59,7 @@ export class StockController {
         @Query('branchId') branchId: string,
         @Query('minDays') minDays: number = 180,
         @Query('minQty') minQty: number = 1,
-        @Request() req,
+        @Request() req: any,
     ) {
         if (req.user.role !== 'HO_ADMIN' && branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');

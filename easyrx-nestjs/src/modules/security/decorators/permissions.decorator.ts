@@ -26,6 +26,21 @@ export enum PermissionCode {
     // User Management
     USER_MANAGE = 'USER:MANAGE',
     USER_CHANGE_ROLE = 'USER:CHANGE_ROLE',
+
+    // Supplier & Purchase
+    SUPPLIER_MANAGE = 'SUPPLIER:MANAGE',
+    PURCHASE_ORDER_MANAGE = 'PURCHASE_ORDER:MANAGE',
+
+    // Company & Branch Management
+    COMPANY_MANAGE = 'COMPANY:MANAGE',
+    BRANCH_MANAGE = 'BRANCH:MANAGE',
+
+    // Pharmacy Management
+    PHARMACY_MANAGE = 'PHARMACY:MANAGE',
+
+    // Accounting
+    ACCOUNTING_VIEW = 'ACCOUNTING:VIEW',
+    ACCOUNTING_MANAGE = 'ACCOUNTING:MANAGE',
 }
 
 export enum UserRole {

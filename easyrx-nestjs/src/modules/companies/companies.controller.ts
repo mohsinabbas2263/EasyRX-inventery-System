@@ -18,7 +18,7 @@ import { CompaniesService } from './companies.service';
 import { CreateCompanyDto, UpdateCompanyDto } from './dto/company.dto';
 import { JwtAuthGuard } from '../security/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../security/guards/permissions.guard';
-import { Permissions } from '../security/decorators/permissions.decorator';
+import { RequirePermissions, PermissionCode } from '../security/decorators/permissions.decorator';
 
 @ApiTags('companies')
 @ApiBearerAuth()
@@ -28,7 +28,7 @@ export class CompaniesController {
     constructor(private readonly companiesService: CompaniesService) { }
 
     @Post()
-    @Permissions('COMPANIES_CREATE')
+    @RequirePermissions(PermissionCode.COMPANY_MANAGE)
     @ApiOperation({ summary: 'Create a new company' })
     @ApiResponse({ status: 201, description: 'Company created successfully' })
     create(@Body() createCompanyDto: CreateCompanyDto) {
@@ -36,28 +36,28 @@ export class CompaniesController {
     }
 
     @Get()
-    @Permissions('COMPANIES_VIEW')
+    @RequirePermissions(PermissionCode.COMPANY_MANAGE)
     @ApiOperation({ summary: 'Get all companies' })
     findAll() {
         return this.companiesService.findAll();
     }
 
     @Get(':id')
-    @Permissions('COMPANIES_VIEW')
+    @RequirePermissions(PermissionCode.COMPANY_MANAGE)
     @ApiOperation({ summary: 'Get a specific company' })
     findOne(@Param('id') id: string) {
         return this.companiesService.findOne(id);
     }
 
     @Patch(':id')
-    @Permissions('COMPANIES_UPDATE')
+    @RequirePermissions(PermissionCode.COMPANY_MANAGE)
     @ApiOperation({ summary: 'Update a company' })
     update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
         return this.companiesService.update(id, updateCompanyDto);
     }
 
     @Delete(':id')
-    @Permissions('COMPANIES_DELETE')
+    @RequirePermissions(PermissionCode.COMPANY_MANAGE)
     @ApiOperation({ summary: 'Delete a company' })
     remove(@Param('id') id: string) {
         return this.companiesService.remove(id);

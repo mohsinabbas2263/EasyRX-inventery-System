@@ -6,7 +6,6 @@ import { JournalEntry } from './entities/journal-entry.entity';
 import { JournalEntryLine } from './entities/journal-entry-line.entity';
 import {
     CreateChartOfAccountDto,
-    UpdateChartOfAccountDto,
 } from './dto/chart-of-account.dto';
 import { CreateJournalEntryDto } from './dto/journal-entry.dto';
 

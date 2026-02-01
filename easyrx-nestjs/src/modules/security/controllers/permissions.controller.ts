@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common'
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { PermissionsGuard } from '../guards/permissions.guard';
 import { RequirePermissions, PermissionCode } from '../decorators/permissions.decorator';
-import { AuditAction } from '../interceptors/audit.interceptor';
+import { AuditAction } from '../decorators/audit.decorator';
 import { PermissionsService } from '../services/permissions.service';
 import { AssignPermissionsDto } from '../dto/change-role.dto';
 import { AuditService } from '../services/audit.service';
@@ -13,7 +13,7 @@ export class PermissionsController {
     constructor(
         private permissionsService: PermissionsService,
         private auditService: AuditService,
-    ) {}
+    ) { }
 
     @Get()
     @RequirePermissions(PermissionCode.USER_MANAGE)
@@ -28,12 +28,11 @@ export class PermissionsController {
     @AuditAction('PERMISSION:ASSIGN')
     async assignPermissions(
         @Body() dto: AssignPermissionsDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         const result = await this.permissionsService.assignBulk(
             dto.userId,
             dto.permissionCodes,
-            req.user.userId,
         );
 
         await this.auditService.createAuditLog({
@@ -43,10 +42,10 @@ export class PermissionsController {
             action: 'PERMISSION:ASSIGN',
             entityType: 'user_permission',
             entityId: dto.userId,
-            beforeData: null,
+            beforeData: undefined,
             afterData: { permissionCodes: dto.permissionCodes },
             ipAddress: req.ip,
-            userAgent: req.get('user-agent'),
+            userAgent: req.headers['user-agent'],
         });
 
         return result;

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Customer } from './entities/customer.entity';
@@ -7,11 +7,9 @@ import { Prescription } from './entities/prescription.entity';
 import { PrescriptionLine } from './entities/prescription-line.entity';
 import {
     CreateCustomerDto,
-    UpdateCustomerDto,
 } from './dto/customer.dto';
 import {
     CreatePrescriberDto,
-    UpdatePrescriberDto,
 } from './dto/prescriber.dto';
 import { CreatePrescriptionDto } from './dto/prescription.dto';
 
@@ -56,17 +54,17 @@ export class PharmacyService {
         await queryRunner.startTransaction();
 
         try {
+            const { lines, ...prescriptionData } = dto;
             const prescription = this.prescriptionRepository.create({
-                ...dto,
+                ...prescriptionData,
                 prescriptionDate: new Date(dto.prescriptionDate),
-                expiryDate: dto.expiryDate ? new Date(dto.expiryDate) : undefined,
                 createdBy: userId,
                 status: dto.status || 'PENDING',
             });
 
-            const savedPrescription = await queryRunner.manager.save(prescription);
+            const savedPrescription = await queryRunner.manager.save(prescription) as Prescription;
 
-            for (const lineDto of dto.lines) {
+            for (const lineDto of lines) {
                 const line = this.lineRepository.create({
                     ...lineDto,
                     prescriptionId: savedPrescription.prescriptionId,

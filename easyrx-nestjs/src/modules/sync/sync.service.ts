@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
 import { SyncQueue } from './entities/sync-queue.entity';
-import { SalesService } from '../sales/sales.service';
 
 @Injectable()
 export class SyncEngineService {
@@ -11,8 +10,6 @@ export class SyncEngineService {
     constructor(
         @InjectRepository(SyncQueue)
         private readonly syncQueueRepository: Repository<SyncQueue>,
-        private readonly salesService: SalesService,
-        private readonly dataSource: DataSource,
     ) { }
 
     /**
@@ -30,7 +27,7 @@ export class SyncEngineService {
         for (const item of pendingItems) {
             try {
                 // 1. Check idempotency (prevent duplicate process)
-                if (await this.isDuplicate(item)) {
+                if (await this.isDuplicate()) {
                     item.status = 'SYNCED';
                     await this.syncQueueRepository.save(item);
                     results.success++;
@@ -56,7 +53,7 @@ export class SyncEngineService {
         return results;
     }
 
-    private async isDuplicate(item: SyncQueue): Promise<boolean> {
+    private async isDuplicate(): Promise<boolean> {
         // Check if the document already exists in the system by localUuid
         // This is specific to each document type's implementation
         // For now, we use the record of the sync queue itself if synchronized before

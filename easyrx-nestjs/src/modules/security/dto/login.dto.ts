@@ -33,7 +33,7 @@ export class LoginResponseDto {
         username: string;
         email: string;
         role: string;
-        branchId: string;
+        branchId: string | null;
         companyId: string;
     };
 }

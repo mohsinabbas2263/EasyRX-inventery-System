@@ -16,19 +16,19 @@ import { InventoryConfigDto, QueryInventoryConfigDto } from '../dto/inventory-co
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../security/guards/permissions.guard';
 import { RequirePermissions, PermissionCode } from '../../security/decorators/permissions.decorator';
-import { AuditAction } from '../../security/interceptors/audit.interceptor';
+import { AuditAction } from '../../security/decorators/audit.decorator';
 
 @Controller('api/v1/inventory/config')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ConfigController {
-    constructor(private configService: InventoryConfigService) {}
+    constructor(private configService: InventoryConfigService) { }
 
     @Get()
     @RequirePermissions(PermissionCode.INVENTORY_ADJUST)
     @AuditAction('INVENTORY:CONFIG_LIST')
     async getConfig(
         @Query() query: QueryInventoryConfigDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         if (req.user.role !== 'HO_ADMIN' && query.branchId && query.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized');
@@ -52,7 +52,7 @@ export class ConfigController {
     @AuditAction('INVENTORY:CONFIG_CREATE')
     async createConfig(
         @Body() dto: InventoryConfigDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         if (req.user.role !== 'HO_ADMIN' && dto.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized');
@@ -71,7 +71,7 @@ export class ConfigController {
     async updateConfig(
         @Param('id') id: string,
         @Body() dto: Partial<InventoryConfigDto>,
-        @Request() req,
+        @Request() req: any,
     ) {
         const existing = await this.configService.findOne(id);
         if (req.user.role !== 'HO_ADMIN' && existing.branchId !== req.user.branchId) {
@@ -86,7 +86,7 @@ export class ConfigController {
     @AuditAction('INVENTORY:CONFIG_DELETE')
     async deleteConfig(
         @Param('id') id: string,
-        @Request() req,
+        @Request() req: any,
     ) {
         const existing = await this.configService.findOne(id);
         if (req.user.role !== 'HO_ADMIN' && existing.branchId !== req.user.branchId) {

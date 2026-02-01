@@ -1,4 +1,4 @@
-import { IsUUID, IsOptional, Min, IsNumber, IsDateString } from 'class-validator';
+import { IsUUID, IsOptional, Min, IsNumber } from 'class-validator';
 
 export class ExpiryReportQueryDto {
     @IsUUID()

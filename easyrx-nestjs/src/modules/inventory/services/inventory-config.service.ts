@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InventoryConfig } from '../entities/inventory-config.entity';
@@ -9,7 +9,7 @@ export class InventoryConfigService {
     constructor(
         @InjectRepository(InventoryConfig)
         private configRepository: Repository<InventoryConfig>,
-    ) {}
+    ) { }
 
     async create(dto: InventoryConfigDto): Promise<InventoryConfig> {
         const existing = await this.configRepository.findOne({
@@ -17,10 +17,10 @@ export class InventoryConfigService {
         });
 
         if (existing) {
-            existing.minQty = dto.minQty;
-            existing.maxQty = dto.maxQty;
-            existing.reorderPoint = dto.reorderPoint;
-            existing.safetyStock = dto.safetyStock;
+            existing.minQty = dto.minQty || 0;
+            existing.maxQty = dto.maxQty || 0;
+            existing.reorderPoint = dto.reorderPoint || 0;
+            existing.safetyStock = dto.safetyStock || 0;
             return this.configRepository.save(existing);
         }
 
@@ -48,12 +48,14 @@ export class InventoryConfigService {
     }
 
     async findOne(id: string): Promise<InventoryConfig> {
-        return this.configRepository.findOne({ where: { id } });
+        const config = await this.configRepository.findOne({ where: { id } });
+        if (!config) throw new NotFoundException(`Config ${id} not found`);
+        return config;
     }
 
     async update(id: string, dto: Partial<InventoryConfigDto>): Promise<InventoryConfig> {
         await this.configRepository.update(id, dto);
-        return this.configRepository.findOne({ where: { id } });
+        return this.findOne(id);
     }
 
     async delete(id: string): Promise<void> {

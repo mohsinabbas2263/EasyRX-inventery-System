@@ -5,7 +5,6 @@ import {
     Min,
     IsOptional,
     ValidateIf,
-    IsString,
     IsBoolean,
 } from 'class-validator';
 import { MovementType, AdjustmentReason, ReferenceDocType } from '../entities/inventory-ledger.entity';

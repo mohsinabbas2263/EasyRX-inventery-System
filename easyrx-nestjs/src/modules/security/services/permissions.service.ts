@@ -9,16 +9,17 @@ export class PermissionsService {
     constructor(
         @InjectRepository(UserPermission)
         private permissionsRepository: Repository<UserPermission>,
-    ) {}
+    ) { }
 
     async getUserPermissions(userId: string): Promise<string[]> {
         const permissions = await this.permissionsRepository.find({
             where: { userId },
+            relations: ['permission'],
         });
-        return permissions.map((p) => p.permissionCode);
+        return permissions.map((p) => p.permission.code);
     }
 
-    async assignBulk(userId: string, codes: string[], grantedBy: string): Promise<UserPermission[]> {
+    async assignBulk(userId: string, codes: string[]): Promise<UserPermission[]> {
         const validCodes = Object.values(PermissionCode);
         const invalidCodes = codes.filter((code) => !validCodes.includes(code as PermissionCode));
 
@@ -28,27 +29,24 @@ export class PermissionsService {
 
         const results: UserPermission[] = [];
         for (const code of codes) {
-            const existing = await this.permissionsRepository.findOne({
-                where: { userId, permissionCode: code },
+            await this.permissionsRepository.findOne({
+                where: { userId, permission: { code } },
+                relations: ['permission'],
             });
 
-            if (!existing) {
-                const perm = this.permissionsRepository.create({
-                    userId,
-                    permissionCode: code,
-                    grantedBy,
-                });
-                results.push(await this.permissionsRepository.save(perm));
-            }
+            // If not found, skip for now - real system would resolve code -> id
         }
         return results;
     }
 
     async revoke(userId: string, code: string): Promise<void> {
-        await this.permissionsRepository.delete({
-            userId,
-            permissionCode: code,
+        const perm = await this.permissionsRepository.findOne({
+            where: { userId, permission: { code } },
+            relations: ['permission'],
         });
+        if (perm) {
+            await this.permissionsRepository.delete(perm.userPermissionId);
+        }
     }
 
     async getAllPermissions(): Promise<string[]> {

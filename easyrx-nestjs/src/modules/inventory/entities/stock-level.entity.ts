@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ViewEntity, Connection } from 'typeorm';
+import { Column, ViewEntity } from 'typeorm';
 
 @ViewEntity({
     name: 'vw_current_stock',

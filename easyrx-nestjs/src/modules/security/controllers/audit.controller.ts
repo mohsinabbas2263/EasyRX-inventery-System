@@ -1,8 +1,8 @@
-import { Controller, Get, Query, UseGuards, Res, Request } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Res } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { PermissionsGuard } from '../guards/permissions.guard';
 import { RequirePermissions, PermissionCode } from '../decorators/permissions.decorator';
-import { AuditAction } from '../interceptors/audit.interceptor';
+import { AuditAction } from '../decorators/audit.decorator';
 import { AuditService } from '../services/audit.service';
 import { Response } from 'express';
 

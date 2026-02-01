@@ -12,7 +12,7 @@ import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../security/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../security/guards/permissions.guard';
 import { RequirePermissions, PermissionCode } from '../security/decorators/permissions.decorator';
-import { AuditAction } from '../security/interceptors/audit.interceptor';
+import { AuditAction } from '../security/decorators/audit.decorator';
 import {
     SalesReportQueryDto,
     ExportFormat,
@@ -31,7 +31,7 @@ export class ReportsController {
     @AuditAction('REPORT:SALES')
     async getSalesReport(
         @Query() query: SalesReportQueryDto,
-        @Request() req,
+        @Request() req: any,
     ): Promise<SalesReportResponseDto> {
         // Enforce branch isolation: non-HO_ADMIN users see only their branch
         if (req.user.role !== 'HO_ADMIN' && query.branchId && query.branchId !== req.user.branchId) {
@@ -48,7 +48,7 @@ export class ReportsController {
     @AuditAction('REPORT:EXPIRY')
     async getExpiryReport(
         @Query() query: ExpiryReportQueryDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         if (req.user.role !== 'HO_ADMIN' && query.branchId && query.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');
@@ -64,7 +64,7 @@ export class ReportsController {
     @AuditAction('REPORT:AGING')
     async getAgingReport(
         @Query() query: AgingReportQueryDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         if (req.user.role !== 'HO_ADMIN' && query.branchId && query.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');
@@ -80,7 +80,7 @@ export class ReportsController {
     @AuditAction('REPORT:SUPPLIER')
     async getSupplierReport(
         @Query() query: SupplierReportQueryDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         if (req.user.role !== 'HO_ADMIN' && query.branchId && query.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');
@@ -96,7 +96,7 @@ export class ReportsController {
     @AuditAction('REPORT:PRODUCTIVITY')
     async getProductivityReport(
         @Query() query: StaffProductivityQueryDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         if (req.user.role !== 'HO_ADMIN' && query.branchId && query.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');
@@ -114,7 +114,6 @@ export class ReportsController {
         @Query('type') type: string,
         @Query('format') format: ExportFormat = ExportFormat.CSV,
         @Query() queryParams: any,
-        @Request() req,
         @Res({ passthrough: false }) res: Response,
     ) {
         if (!['sales', 'expiry', 'aging', 'supplier', 'productivity'].includes(type)) {

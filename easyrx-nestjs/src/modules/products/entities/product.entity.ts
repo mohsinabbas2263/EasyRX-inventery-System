@@ -37,6 +37,9 @@ export class Product {
     @Column({ name: 'is_prescription_required', default: false })
     isPrescriptionRequired!: boolean;
 
+    @Column({ name: 'is_medicine', default: true })
+    isMedicine!: boolean;
+
     @Column({ name: 'reorder_level', type: 'decimal', precision: 10, scale: 2, default: 0 })
     reorderLevel!: number;
 

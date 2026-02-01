@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { SalesInvoice } from './entities/sales-invoice.entity';
@@ -101,7 +101,7 @@ export class SalesService {
         }
     }
 
-    async findAll(query: any, user: User) {
+    async findAll(_query: any, user: User) {
         return this.invoiceRepository.find({
             where: { companyId: user.companyId },
             order: { saleDate: 'DESC' },

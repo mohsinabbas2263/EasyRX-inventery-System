@@ -5,7 +5,9 @@ import {
     CallHandler,
     Logger,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
+import { AUDIT_ACTION_KEY } from '../decorators/audit.decorator';
 import { tap } from 'rxjs/operators';
 import { AuditService } from '../services/audit.service';
 
@@ -13,18 +15,22 @@ import { AuditService } from '../services/audit.service';
 export class AuditInterceptor implements NestInterceptor {
     private readonly logger = new Logger(AuditInterceptor.name);
 
-    constructor(private readonly auditService: AuditService) { }
+    constructor(
+        private readonly auditService: AuditService,
+        private readonly reflector: Reflector,
+    ) { }
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const request = context.switchToHttp().getRequest();
         const { method, body, user } = request;
 
-        // Only audit state-changing operations
-        if (method === 'GET') {
+        const auditAction = this.reflector.get<string>(AUDIT_ACTION_KEY, context.getHandler()) ||
+            this.mapMethodToAction(method);
+
+        // Only audit if we have an action or it's a state-changing operation
+        if (method === 'GET' && !this.reflector.get<string>(AUDIT_ACTION_KEY, context.getHandler())) {
             return next.handle();
         }
-
-        const auditAction = this.mapMethodToAction(method);
         const entityType = this.extractEntityType(context);
 
         return next.handle().pipe(

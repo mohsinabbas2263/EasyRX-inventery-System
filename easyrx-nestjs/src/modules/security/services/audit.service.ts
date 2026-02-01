@@ -47,7 +47,7 @@ export class AuditService {
         return { data, total };
     }
 
-    async exportAuditCsv(filter: {
+    async exportAuditCsv(_filter?: {
         from?: Date;
         to?: Date;
         userId?: string;

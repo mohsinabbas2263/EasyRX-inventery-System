@@ -28,7 +28,7 @@ export class ProductsController {
     @ApiOperation({ summary: 'Create new product' })
     @ApiResponse({ status: 201, description: 'Product created successfully' })
     @ApiResponse({ status: 409, description: 'Product with barcode already exists' })
-    create(@Body() createProductDto: CreateProductDto, @Request() req) {
+    create(@Body() createProductDto: CreateProductDto, @Request() req: any) {
         return this.productsService.create(
             createProductDto,
             req.user.companyId,
@@ -39,7 +39,7 @@ export class ProductsController {
     @Get()
     @ApiOperation({ summary: 'Get all products' })
     @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
-    findAll(@Query() query: ProductQueryDto, @Request() req) {
+    findAll(@Query() query: ProductQueryDto, @Request() req: any) {
         return this.productsService.findAll(req.user.companyId, query);
     }
 
@@ -47,14 +47,14 @@ export class ProductsController {
     @ApiOperation({ summary: 'Get product by ID' })
     @ApiResponse({ status: 200, description: 'Product found' })
     @ApiResponse({ status: 404, description: 'Product not found' })
-    findOne(@Param('id') id: string, @Request() req) {
+    findOne(@Param('id') id: string, @Request() req: any) {
         return this.productsService.findOne(id, req.user.companyId);
     }
 
     @Get('barcode/:barcode')
     @ApiOperation({ summary: 'Find product by barcode' })
     @ApiResponse({ status: 200, description: 'Product found' })
-    findByBarcode(@Param('barcode') barcode: string, @Request() req) {
+    findByBarcode(@Param('barcode') barcode: string, @Request() req: any) {
         return this.productsService.findByBarcode(barcode, req.user.companyId);
     }
 
@@ -65,7 +65,7 @@ export class ProductsController {
     update(
         @Param('id') id: string,
         @Body() updateProductDto: UpdateProductDto,
-        @Request() req,
+        @Request() req: any,
     ) {
         return this.productsService.update(
             id,
@@ -79,7 +79,7 @@ export class ProductsController {
     @ApiOperation({ summary: 'Delete product (soft delete)' })
     @ApiResponse({ status: 200, description: 'Product deleted successfully' })
     @ApiResponse({ status: 404, description: 'Product not found' })
-    remove(@Param('id') id: string, @Request() req) {
+    remove(@Param('id') id: string, @Request() req: any) {
         return this.productsService.remove(id, req.user.companyId);
     }
 }

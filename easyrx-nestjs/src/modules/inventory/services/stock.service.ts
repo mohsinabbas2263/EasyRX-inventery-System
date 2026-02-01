@@ -1,25 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { DataSource } from 'typeorm';
 // import { CACHE_MANAGER } from '@nestjs/cache-manager';
 // import { Cache } from 'cache-manager';
-import { InventoryLedger, MovementType } from '../entities/inventory-ledger.entity';
-import { StockLevel } from '../entities/stock-level.entity';
-import { Product } from '../../products/entities/product.entity';
-import { ProductBatch } from '../../products/entities/product-batch.entity';
+import { MovementType } from '../entities/inventory-ledger.entity';
 import { StockQueryDto } from '../dto/stock-query.dto';
 
 @Injectable()
 export class StockService {
     constructor(
-        @InjectRepository(InventoryLedger)
-        private ledgerRepository: Repository<InventoryLedger>,
-        @InjectRepository(StockLevel)
-        private stockLevelRepository: Repository<StockLevel>,
-        @InjectRepository(Product)
-        private productRepository: Repository<Product>,
-        @InjectRepository(ProductBatch)
-        private batchRepository: Repository<ProductBatch>,
         private dataSource: DataSource,
         // @Inject(CACHE_MANAGER) private cacheManager: Cache,
     ) { }
@@ -257,7 +245,7 @@ export class StockService {
         return picks;
     }
 
-    async invalidateStockCache(branchId: string): Promise<void> {
+    async invalidateStockCache(_branchId: string): Promise<void> {
         // Invalidate all cache entries for this branch
         // const pattern = `stock:*${branchId}*`;
         // const keys = await this.cacheManager.store.keys();
