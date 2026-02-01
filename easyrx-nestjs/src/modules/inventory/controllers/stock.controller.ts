@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, Request, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Request as NestRequest, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { StockService } from '../services/stock.service';
 import { StockQueryDto } from '../dto/stock-query.dto';
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../security/guards/permissions.guard';
 import { RequirePermissions, PermissionCode } from '../../security/decorators/permissions.decorator';
 import { AuditAction } from '../../security/decorators/audit.decorator';
+import { RequestWithUser } from '../../../common/interfaces/request-with-user.interface';
 
 @ApiTags('Inventory')
 @ApiBearerAuth()
@@ -20,15 +21,19 @@ export class StockController {
     @ApiOperation({ summary: 'Get current stock' })
     async getStock(
         @Query() query: StockQueryDto,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         // Enforce branch scoping
-        if (req.user.role !== 'HO_ADMIN' && query.branchId !== req.user.branchId) {
+        if (req.user.role !== 'HO_ADMIN' && query.branchId && query.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');
         }
 
         if (req.user.role !== 'HO_ADMIN') {
-            query.branchId = req.user.branchId;
+            query.branchId = req.user.branchId || '';
+        }
+
+        if (!query.branchId) {
+            throw new BadRequestException('Branch ID is required');
         }
 
         return this.stockService.getCurrentStock(query);
@@ -39,15 +44,20 @@ export class StockController {
     @AuditAction('INVENTORY:NEAR_EXPIRY')
     @ApiOperation({ summary: 'Get near-expiry batches' })
     async getNearExpiry(
-        @Query('branchId') branchId: string,
+        @NestRequest() req: RequestWithUser,
+        @Query('branchId') branchId?: string,
         @Query('days') days: number = 90,
-        @Request() req: any,
     ) {
-        if (req.user.role !== 'HO_ADMIN' && branchId !== req.user.branchId) {
+        const finalBranchId = branchId || req.user.branchId || '';
+
+        if (req.user.role !== 'HO_ADMIN' && finalBranchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');
         }
 
-        const finalBranchId = req.user.role === 'HO_ADMIN' ? branchId : req.user.branchId;
+        if (!finalBranchId) {
+            throw new BadRequestException('Branch ID is required');
+        }
+
         return this.stockService.getNearExpiry(finalBranchId, days);
     }
 
@@ -56,16 +66,21 @@ export class StockController {
     @AuditAction('INVENTORY:DEAD_STOCK')
     @ApiOperation({ summary: 'Get dead stock report' })
     async getDeadStock(
-        @Query('branchId') branchId: string,
+        @NestRequest() req: RequestWithUser,
+        @Query('branchId') branchId?: string,
         @Query('minDays') minDays: number = 180,
         @Query('minQty') minQty: number = 1,
-        @Request() req: any,
     ) {
-        if (req.user.role !== 'HO_ADMIN' && branchId !== req.user.branchId) {
+        const finalBranchId = branchId || req.user.branchId || '';
+
+        if (req.user.role !== 'HO_ADMIN' && finalBranchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot view other branches');
         }
 
-        const finalBranchId = req.user.role === 'HO_ADMIN' ? branchId : req.user.branchId;
+        if (!finalBranchId) {
+            throw new BadRequestException('Branch ID is required');
+        }
+
         return this.stockService.getDeadStock(finalBranchId, minDays, minQty);
     }
 }

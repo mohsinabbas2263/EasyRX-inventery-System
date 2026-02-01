@@ -1,4 +1,5 @@
-import { Controller, Post, Body, UseGuards, Request, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request as NestRequest, BadRequestException } from '@nestjs/common';
+import { RequestWithUser } from '../../../common/interfaces/request-with-user.interface';
 import { MovementService } from '../services/movement.service';
 import { CreateMovementDto } from '../dto/create-movement.dto';
 import { CycleCountDto, AdjustmentDto } from '../dto/adjustment.dto';
@@ -17,14 +18,14 @@ export class MovementController {
     @AuditAction('INVENTORY:CREATE_MOVEMENT')
     async createMovement(
         @Body() dto: CreateMovementDto,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         if (req.user.role !== 'HO_ADMIN' && dto.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized: Cannot post movements for other branches');
         }
 
         if (req.user.role !== 'HO_ADMIN') {
-            dto.branchId = req.user.branchId;
+            dto.branchId = req.user.branchId || '';
         }
 
         return this.movementService.createMovement(dto, req.user.userId);
@@ -35,14 +36,14 @@ export class MovementController {
     @AuditAction('INVENTORY:CYCLE_COUNT')
     async applyCycleCount(
         @Body() dto: CycleCountDto,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         if (req.user.role !== 'HO_ADMIN' && dto.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized');
         }
 
         if (req.user.role !== 'HO_ADMIN') {
-            dto.branchId = req.user.branchId;
+            dto.branchId = req.user.branchId || '';
         }
 
         return this.movementService.applyCycleCount(dto, req.user.userId);
@@ -53,14 +54,14 @@ export class MovementController {
     @AuditAction('INVENTORY:ADJUSTMENT')
     async createAdjustment(
         @Body() dto: AdjustmentDto,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         if (req.user.role !== 'HO_ADMIN' && dto.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized');
         }
 
         if (req.user.role !== 'HO_ADMIN') {
-            dto.branchId = req.user.branchId;
+            dto.branchId = req.user.branchId || '';
         }
 
         return this.movementService.createAdjustment(dto, req.user.userId);

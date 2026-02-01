@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserPermission } from '../entities/user-permission.entity';
+import { Permission } from '../entities/permission.entity';
 import { PermissionCode } from '../decorators/permissions.decorator';
 
 @Injectable()
@@ -9,6 +10,8 @@ export class PermissionsService {
     constructor(
         @InjectRepository(UserPermission)
         private permissionsRepository: Repository<UserPermission>,
+        @InjectRepository(Permission)
+        private permissionRepository: Repository<Permission>,
     ) { }
 
     async getUserPermissions(userId: string): Promise<string[]> {
@@ -29,12 +32,24 @@ export class PermissionsService {
 
         const results: UserPermission[] = [];
         for (const code of codes) {
-            await this.permissionsRepository.findOne({
-                where: { userId, permission: { code } },
-                relations: ['permission'],
+            // 1. Get Permission entity
+            const permission = await this.permissionRepository.findOne({ where: { code } });
+            if (!permission) continue;
+
+            // 2. Check if already assigned
+            let userPerm = await this.permissionsRepository.findOne({
+                where: { userId, permissionId: permission.permissionId },
             });
 
-            // If not found, skip for now - real system would resolve code -> id
+            if (!userPerm) {
+                userPerm = this.permissionsRepository.create({
+                    userId,
+                    permissionId: permission.permissionId,
+                });
+                results.push(await this.permissionsRepository.save(userPerm));
+            } else {
+                results.push(userPerm);
+            }
         }
         return results;
     }

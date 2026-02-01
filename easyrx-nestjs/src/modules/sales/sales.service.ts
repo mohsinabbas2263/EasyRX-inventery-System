@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Between, Like, FindOptionsWhere } from 'typeorm';
 import { SalesInvoice } from './entities/sales-invoice.entity';
 import { SalesInvoiceLine } from './entities/sales-invoice-line.entity';
 import { CreateSaleDto } from './dto/create-sale.dto';
+import { SalesQueryDto } from './dto/sales-query.dto';
 import { BatchSelectionService } from '../inventory/services/batch-selection.service';
 import { StockLedgerService } from '../inventory/services/stock-ledger.service';
 import { User } from '../users/entities/user.entity';
@@ -101,9 +102,30 @@ export class SalesService {
         }
     }
 
-    async findAll(_query: any, user: User) {
+    async findAll(query: SalesQueryDto, user: User) {
+        const where: FindOptionsWhere<SalesInvoice> = { companyId: user.companyId };
+
+        if (query.branchId) {
+            where.branchId = query.branchId;
+        }
+        if (query.customerId) {
+            where.customerId = query.customerId;
+        }
+        if (query.status) {
+            where.status = query.status;
+        }
+        if (query.fromDate || query.toDate) {
+            where.saleDate = Between(
+                query.fromDate ? new Date(query.fromDate) : new Date(0),
+                query.toDate ? new Date(query.toDate) : new Date(),
+            );
+        }
+        if (query.search) {
+            where.saleNumber = Like(`%${query.search}%`);
+        }
+
         return this.invoiceRepository.find({
-            where: { companyId: user.companyId },
+            where,
             order: { saleDate: 'DESC' },
         });
     }

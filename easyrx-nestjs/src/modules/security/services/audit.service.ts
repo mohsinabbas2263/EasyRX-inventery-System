@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, FindOptionsWhere } from 'typeorm';
 import { AuditLog } from '../entities/audit-log.entity';
-// import { Parser } from 'json2csv';
+import { CsvUtility } from '../../../common/utils/csv.utility';
 
 @Injectable()
 export class AuditService {
@@ -25,6 +25,7 @@ export class AuditService {
         userId?: string;
         action?: string;
         entityType?: string;
+        companyId?: string;
         limit?: number;
         offset?: number;
     }): Promise<{ data: AuditLog[]; total: number }> {
@@ -36,6 +37,7 @@ export class AuditService {
         if (filter.userId) where.userId = filter.userId;
         if (filter.action) where.action = filter.action;
         if (filter.entityType) where.entityType = filter.entityType;
+        if (filter.companyId) where.companyId = filter.companyId;
 
         const [data, total] = await this.auditRepository.findAndCount({
             where,
@@ -47,32 +49,31 @@ export class AuditService {
         return { data, total };
     }
 
-    async exportAuditCsv(_filter?: {
+    async exportAuditCsv(filter?: {
         from?: Date;
         to?: Date;
         userId?: string;
         action?: string;
+        companyId?: string;
     }): Promise<string> {
-        // const { data } = await this.getAuditLogs({ ...filter, limit: 10000 });
+        const { data } = await this.getAuditLogs({ ...filter, limit: 10000 });
 
-        // const records = data.map((log) => ({
-        //     id: log.id,
-        //     timestamp: log.createdAt.toISOString(),
-        //     userId: log.userId,
-        //     action: log.action,
-        //     entity: log.entityType,
-        //     entityId: log.entityId,
-        //     ipAddress: log.ipAddress,
-        //     userAgent: log.userAgent,
-        //     changes: `Before: ${JSON.stringify(log.beforeData)} | After: ${JSON.stringify(log.afterData)}`,
-        // }));
+        const records = data.map((log) => ({
+            id: log.id,
+            timestamp: log.createdAt.toISOString(),
+            userId: log.userId,
+            action: log.action,
+            entity: log.entityType,
+            entityId: log.entityId,
+            ipAddress: log.ipAddress,
+            userAgent: log.userAgent,
+            changes: `Before: ${JSON.stringify(log.beforeData)} | After: ${JSON.stringify(log.afterData)}`,
+        }));
 
-        // try {
-        //     const parser = new Parser();
-        //     return parser.parse(records);
-        // } catch (error: any) {
-        //     throw new Error(`CSV export failed: ${error.message}`);
-        // }
-        return '';
+        try {
+            return CsvUtility.jsonToCsv(records);
+        } catch (error: any) {
+            throw new Error(`CSV export failed: ${error.message}`);
+        }
     }
 }

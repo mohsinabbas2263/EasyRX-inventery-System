@@ -8,9 +8,10 @@ import {
     Query,
     Body,
     UseGuards,
-    Request,
+    Request as NestRequest,
     BadRequestException,
 } from '@nestjs/common';
+import { RequestWithUser } from '../../../common/interfaces/request-with-user.interface';
 import { InventoryConfigService } from '../services/inventory-config.service';
 import { InventoryConfigDto, QueryInventoryConfigDto } from '../dto/inventory-config.dto';
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard';
@@ -28,14 +29,14 @@ export class ConfigController {
     @AuditAction('INVENTORY:CONFIG_LIST')
     async getConfig(
         @Query() query: QueryInventoryConfigDto,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         if (req.user.role !== 'HO_ADMIN' && query.branchId && query.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized');
         }
 
         if (req.user.role !== 'HO_ADMIN') {
-            query.branchId = req.user.branchId;
+            query.branchId = req.user.branchId || '';
         }
 
         return this.configService.findAll(query);
@@ -52,14 +53,14 @@ export class ConfigController {
     @AuditAction('INVENTORY:CONFIG_CREATE')
     async createConfig(
         @Body() dto: InventoryConfigDto,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         if (req.user.role !== 'HO_ADMIN' && dto.branchId !== req.user.branchId) {
             throw new BadRequestException('Unauthorized');
         }
 
         if (req.user.role !== 'HO_ADMIN') {
-            dto.branchId = req.user.branchId;
+            dto.branchId = req.user.branchId || '';
         }
 
         return this.configService.create(dto);
@@ -71,7 +72,7 @@ export class ConfigController {
     async updateConfig(
         @Param('id') id: string,
         @Body() dto: Partial<InventoryConfigDto>,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         const existing = await this.configService.findOne(id);
         if (req.user.role !== 'HO_ADMIN' && existing.branchId !== req.user.branchId) {
@@ -86,7 +87,7 @@ export class ConfigController {
     @AuditAction('INVENTORY:CONFIG_DELETE')
     async deleteConfig(
         @Param('id') id: string,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         const existing = await this.configService.findOne(id);
         if (req.user.role !== 'HO_ADMIN' && existing.branchId !== req.user.branchId) {

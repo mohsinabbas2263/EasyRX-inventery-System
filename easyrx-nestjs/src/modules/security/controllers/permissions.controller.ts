@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request as NestRequest } from '@nestjs/common';
+import { RequestWithUser } from '../../../common/interfaces/request-with-user.interface';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { PermissionsGuard } from '../guards/permissions.guard';
 import { RequirePermissions, PermissionCode } from '../decorators/permissions.decorator';
@@ -28,7 +29,7 @@ export class PermissionsController {
     @AuditAction('PERMISSION:ASSIGN')
     async assignPermissions(
         @Body() dto: AssignPermissionsDto,
-        @Request() req: any,
+        @NestRequest() req: RequestWithUser,
     ) {
         const result = await this.permissionsService.assignBulk(
             dto.userId,

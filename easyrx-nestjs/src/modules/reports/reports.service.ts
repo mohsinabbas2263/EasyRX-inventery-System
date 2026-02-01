@@ -5,7 +5,7 @@ import { DataSource } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 // import { Parser } from 'fast-csv';
-import { CsvUtility } from './utils/csv.utility';
+import { CsvUtility } from '../../common/utils/csv.utility';
 import {
     SalesReportQueryDto,
     SalesReportResponseDto,
