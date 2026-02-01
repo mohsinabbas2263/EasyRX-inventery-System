@@ -9,17 +9,17 @@ import { PharmacyService } from './pharmacy.service';
 import { PharmacyController } from './pharmacy.controller';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([
-            Customer,
-            Prescriber,
-            Prescription,
-            PrescriptionLine,
-            ControlledDispenseLog,
-        ]),
-    ],
-    providers: [PharmacyService],
-    controllers: [PharmacyController],
-    exports: [PharmacyService, TypeOrmModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Customer,
+      Prescriber,
+      Prescription,
+      PrescriptionLine,
+      ControlledDispenseLog,
+    ]),
+  ],
+  providers: [PharmacyService],
+  controllers: [PharmacyController],
+  exports: [PharmacyService, TypeOrmModule],
 })
-export class PharmacyModule { }
+export class PharmacyModule {}

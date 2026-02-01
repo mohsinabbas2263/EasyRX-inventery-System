@@ -10,21 +10,21 @@ import { Product } from '../products/entities/product.entity';
 import { ProductBatch } from '../products/entities/product-batch.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([
-            SalesInvoice,
-            SalesInvoiceLine,
-            InventoryLedger,
-            Product,
-            ProductBatch,
-        ]),
-        // CacheModule.register({
-        //     ttl: 5 * 60 * 1000, // 5 minutes
-        //     max: 100,
-        // }),
-    ],
-    controllers: [ReportsController],
-    providers: [ReportsService],
-    exports: [ReportsService],
+  imports: [
+    TypeOrmModule.forFeature([
+      SalesInvoice,
+      SalesInvoiceLine,
+      InventoryLedger,
+      Product,
+      ProductBatch,
+    ]),
+    // CacheModule.register({
+    //     ttl: 5 * 60 * 1000, // 5 minutes
+    //     max: 100,
+    // }),
+  ],
+  controllers: [ReportsController],
+  providers: [ReportsService],
+  exports: [ReportsService],
 })
-export class ReportsModule { }
+export class ReportsModule {}

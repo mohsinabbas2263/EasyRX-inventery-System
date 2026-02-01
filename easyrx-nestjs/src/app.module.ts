@@ -24,78 +24,78 @@ import { AuditInterceptor } from './modules/security/interceptors/audit.intercep
 import { validate } from './config/env.validation';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-            envFilePath: '.env',
-            validate,
-        }),
-        TypeOrmModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => ({
-                type: 'postgres',
-                host: configService.get('DATABASE_HOST', 'localhost'),
-                port: configService.get('DATABASE_PORT', 5432),
-                username: configService.get('DATABASE_USER', 'postgres'),
-                password: configService.get('DATABASE_PASSWORD'),
-                database: configService.get('DATABASE_NAME', 'easyrx'),
-                entities: ['dist/**/*.entity.js'],
-                synchronize: false, // Use migrations instead
-                logging: configService.get('DB_LOGGING', false),
-            }),
-        }),
-        // CacheModule.register({
-        //     isGlobal: true,
-        //     ttl: 5 * 60 * 1000, // 5 minutes default
-        //     max: 1000,
-        // }),
-        ThrottlerModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => [
-                {
-                    name: 'short',
-                    ttl: configService.get<number>('THROTTLE_TTL_SHORT', 1000),
-                    limit: configService.get<number>('THROTTLE_LIMIT_SHORT', 3),
-                },
-                {
-                    name: 'long',
-                    ttl: configService.get<number>('THROTTLE_TTL_LONG', 60000),
-                    limit: configService.get<number>('THROTTLE_LIMIT_LONG', 100),
-                },
-            ],
-        }),
-        // Core modules
-        SecurityModule, // Includes Audit and Permissions functionality
-        UsersModule,
-        ProductsModule,
-        // Feature modules
-        InventoryModule,
-        SalesModule,
-        PurchaseModule,
-        ReportsModule,
-        CompaniesModule,
-        BranchesModule,
-        PharmacyModule,
-        TransfersModule,
-        SyncModule,
-        AccountingModule,
-    ],
-    controllers: [HealthController],
-    providers: [
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      validate,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DATABASE_HOST', 'localhost'),
+        port: configService.get('DATABASE_PORT', 5432),
+        username: configService.get('DATABASE_USER', 'postgres'),
+        password: configService.get('DATABASE_PASSWORD'),
+        database: configService.get('DATABASE_NAME', 'easyrx'),
+        entities: ['dist/**/*.entity.js'],
+        synchronize: false, // Use migrations instead
+        logging: configService.get('DB_LOGGING', false),
+      }),
+    }),
+    // CacheModule.register({
+    //     isGlobal: true,
+    //     ttl: 5 * 60 * 1000, // 5 minutes default
+    //     max: 1000,
+    // }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => [
         {
-            provide: APP_GUARD,
-            useClass: JwtAuthGuard,
+          name: 'short',
+          ttl: configService.get<number>('THROTTLE_TTL_SHORT', 1000),
+          limit: configService.get<number>('THROTTLE_LIMIT_SHORT', 3),
         },
         {
-            provide: APP_GUARD,
-            useClass: ThrottlerGuard,
+          name: 'long',
+          ttl: configService.get<number>('THROTTLE_TTL_LONG', 60000),
+          limit: configService.get<number>('THROTTLE_LIMIT_LONG', 100),
         },
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: AuditInterceptor,
-        },
-    ],
+      ],
+    }),
+    // Core modules
+    SecurityModule, // Includes Audit and Permissions functionality
+    UsersModule,
+    ProductsModule,
+    // Feature modules
+    InventoryModule,
+    SalesModule,
+    PurchaseModule,
+    ReportsModule,
+    CompaniesModule,
+    BranchesModule,
+    PharmacyModule,
+    TransfersModule,
+    SyncModule,
+    AccountingModule,
+  ],
+  controllers: [HealthController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}

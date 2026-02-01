@@ -20,35 +20,41 @@ import { RefreshToken } from './entities/refresh-token.entity';
 import { User } from '../users/entities/user.entity';
 
 @Module({
-    imports: [
-        ConfigModule,
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-        JwtModule.registerAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: async (configService: ConfigService) => ({
-                secret: configService.get<string>('JWT_SECRET'),
-                signOptions: { expiresIn: '24h' },
-            }),
-        }),
-        TypeOrmModule.forFeature([
-            AuditLog,
-            UserPermission,
-            Permission,
-            RefreshToken,
-            User,
-        ]),
-    ],
-    controllers: [AuthController, PermissionsController, AuditController],
-    providers: [
-        AuthService,
-        PermissionsService,
-        AuditService,
-        JwtStrategy,
-        JwtAuthGuard,
-        PermissionsGuard,
-        AuditInterceptor,
-    ],
-    exports: [AuthService, PermissionsService, AuditService, JwtAuthGuard, PermissionsGuard],
+  imports: [
+    ConfigModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '24h' },
+      }),
+    }),
+    TypeOrmModule.forFeature([
+      AuditLog,
+      UserPermission,
+      Permission,
+      RefreshToken,
+      User,
+    ]),
+  ],
+  controllers: [AuthController, PermissionsController, AuditController],
+  providers: [
+    AuthService,
+    PermissionsService,
+    AuditService,
+    JwtStrategy,
+    JwtAuthGuard,
+    PermissionsGuard,
+    AuditInterceptor,
+  ],
+  exports: [
+    AuthService,
+    PermissionsService,
+    AuditService,
+    JwtAuthGuard,
+    PermissionsGuard,
+  ],
 })
-export class SecurityModule { }
+export class SecurityModule {}

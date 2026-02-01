@@ -6,8 +6,8 @@ import { BatchSelectionService } from './services/batch-selection.service';
 import { StockLedgerService } from './services/stock-ledger.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([InventoryLedger, ProductBatch])],
-    providers: [BatchSelectionService, StockLedgerService],
-    exports: [BatchSelectionService, StockLedgerService],
+  imports: [TypeOrmModule.forFeature([InventoryLedger, ProductBatch])],
+  providers: [BatchSelectionService, StockLedgerService],
+  exports: [BatchSelectionService, StockLedgerService],
 })
-export class InventoryModule { }
+export class InventoryModule {}

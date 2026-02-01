@@ -9,13 +9,13 @@ import { InventoryModule } from '../inventory/inventory.module';
 import { ProductsModule } from '../products/products.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([SalesInvoice, SalesInvoiceLine, SalesReturn]),
-        InventoryModule,
-        ProductsModule,
-    ],
-    providers: [SalesService],
-    controllers: [SalesController],
-    exports: [SalesService],
+  imports: [
+    TypeOrmModule.forFeature([SalesInvoice, SalesInvoiceLine, SalesReturn]),
+    InventoryModule,
+    ProductsModule,
+  ],
+  providers: [SalesService],
+  controllers: [SalesController],
+  exports: [SalesService],
 })
-export class SalesModule { }
+export class SalesModule {}

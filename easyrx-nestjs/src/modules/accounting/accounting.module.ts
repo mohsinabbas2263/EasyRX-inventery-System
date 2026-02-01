@@ -7,15 +7,11 @@ import { AccountingService } from './accounting.service';
 import { AccountingController } from './accounting.controller';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([
-            ChartOfAccount,
-            JournalEntry,
-            JournalEntryLine,
-        ]),
-    ],
-    providers: [AccountingService],
-    controllers: [AccountingController],
-    exports: [AccountingService, TypeOrmModule],
+  imports: [
+    TypeOrmModule.forFeature([ChartOfAccount, JournalEntry, JournalEntryLine]),
+  ],
+  providers: [AccountingService],
+  controllers: [AccountingController],
+  exports: [AccountingService, TypeOrmModule],
 })
-export class AccountingModule { }
+export class AccountingModule {}

@@ -5,8 +5,8 @@ import { SyncEngineService } from './sync.service';
 import { SalesModule } from '../sales/sales.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([SyncQueue]), SalesModule],
-    providers: [SyncEngineService],
-    exports: [SyncEngineService],
+  imports: [TypeOrmModule.forFeature([SyncQueue]), SalesModule],
+  providers: [SyncEngineService],
+  exports: [SyncEngineService],
 })
-export class SyncModule { }
+export class SyncModule {}

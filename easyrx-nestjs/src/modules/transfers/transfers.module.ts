@@ -4,7 +4,7 @@ import { StockTransfer } from './entities/stock-transfer.entity';
 import { StockTransferLine } from './entities/stock-transfer-line.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([StockTransfer, StockTransferLine])],
-    exports: [TypeOrmModule],
+  imports: [TypeOrmModule.forFeature([StockTransfer, StockTransferLine])],
+  exports: [TypeOrmModule],
 })
-export class TransfersModule { }
+export class TransfersModule {}

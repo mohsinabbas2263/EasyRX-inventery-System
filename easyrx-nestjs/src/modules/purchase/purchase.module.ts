@@ -9,17 +9,17 @@ import { PurchaseService } from './purchase.service';
 import { PurchaseController } from './purchase.controller';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([
-            Supplier,
-            PurchaseOrder,
-            PurchaseOrderLine,
-            GoodsReceiptNote,
-            GRNLine,
-        ]),
-    ],
-    providers: [PurchaseService],
-    controllers: [PurchaseController],
-    exports: [PurchaseService, TypeOrmModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Supplier,
+      PurchaseOrder,
+      PurchaseOrderLine,
+      GoodsReceiptNote,
+      GRNLine,
+    ]),
+  ],
+  providers: [PurchaseService],
+  controllers: [PurchaseController],
+  exports: [PurchaseService, TypeOrmModule],
 })
-export class PurchaseModule { }
+export class PurchaseModule {}

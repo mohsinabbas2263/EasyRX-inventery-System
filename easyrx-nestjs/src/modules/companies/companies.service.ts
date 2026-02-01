@@ -6,36 +6,41 @@ import { CreateCompanyDto, UpdateCompanyDto } from './dto/company.dto';
 
 @Injectable()
 export class CompaniesService {
-    constructor(
-        @InjectRepository(Company)
-        private readonly companyRepository: Repository<Company>,
-    ) { }
+  constructor(
+    @InjectRepository(Company)
+    private readonly companyRepository: Repository<Company>,
+  ) {}
 
-    async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-        const company = this.companyRepository.create(createCompanyDto);
-        return await this.companyRepository.save(company);
-    }
+  async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
+    const company = this.companyRepository.create(createCompanyDto);
+    return await this.companyRepository.save(company);
+  }
 
-    async findAll(): Promise<Company[]> {
-        return await this.companyRepository.find();
-    }
+  async findAll(): Promise<Company[]> {
+    return await this.companyRepository.find();
+  }
 
-    async findOne(id: string): Promise<Company> {
-        const company = await this.companyRepository.findOne({ where: { companyId: id } });
-        if (!company) {
-            throw new NotFoundException(`Company with ID ${id} not found`);
-        }
-        return company;
+  async findOne(id: string): Promise<Company> {
+    const company = await this.companyRepository.findOne({
+      where: { companyId: id },
+    });
+    if (!company) {
+      throw new NotFoundException(`Company with ID ${id} not found`);
     }
+    return company;
+  }
 
-    async update(id: string, updateCompanyDto: UpdateCompanyDto): Promise<Company> {
-        const company = await this.findOne(id);
-        Object.assign(company, updateCompanyDto);
-        return await this.companyRepository.save(company);
-    }
+  async update(
+    id: string,
+    updateCompanyDto: UpdateCompanyDto,
+  ): Promise<Company> {
+    const company = await this.findOne(id);
+    Object.assign(company, updateCompanyDto);
+    return await this.companyRepository.save(company);
+  }
 
-    async remove(id: string): Promise<void> {
-        const company = await this.findOne(id);
-        await this.companyRepository.remove(company);
-    }
+  async remove(id: string): Promise<void> {
+    const company = await this.findOne(id);
+    await this.companyRepository.remove(company);
+  }
 }

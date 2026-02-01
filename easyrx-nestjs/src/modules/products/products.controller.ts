@@ -1,16 +1,21 @@
 import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    Query,
-    UseGuards,
-    Request as NestRequest,
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+  Request as NestRequest,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { RequestWithUser } from '../../common/interfaces/request-with-user.interface';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -23,64 +28,76 @@ import { JwtAuthGuard } from '../security/guards/jwt-auth.guard';
 @Controller('products')
 @UseGuards(JwtAuthGuard)
 export class ProductsController {
-    constructor(private readonly productsService: ProductsService) { }
+  constructor(private readonly productsService: ProductsService) {}
 
-    @Post()
-    @ApiOperation({ summary: 'Create new product' })
-    @ApiResponse({ status: 201, description: 'Product created successfully' })
-    @ApiResponse({ status: 409, description: 'Product with barcode already exists' })
-    create(@Body() createProductDto: CreateProductDto, @NestRequest() req: RequestWithUser) {
-        return this.productsService.create(
-            createProductDto,
-            req.user.companyId,
-            req.user.userId,
-        );
-    }
+  @Post()
+  @ApiOperation({ summary: 'Create new product' })
+  @ApiResponse({ status: 201, description: 'Product created successfully' })
+  @ApiResponse({
+    status: 409,
+    description: 'Product with barcode already exists',
+  })
+  create(
+    @Body() createProductDto: CreateProductDto,
+    @NestRequest() req: RequestWithUser,
+  ) {
+    return this.productsService.create(
+      createProductDto,
+      req.user.companyId,
+      req.user.userId,
+    );
+  }
 
-    @Get()
-    @ApiOperation({ summary: 'Get all products' })
-    @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
-    findAll(@Query() query: ProductQueryDto, @NestRequest() req: RequestWithUser) {
-        return this.productsService.findAll(req.user.companyId, query);
-    }
+  @Get()
+  @ApiOperation({ summary: 'Get all products' })
+  @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
+  findAll(
+    @Query() query: ProductQueryDto,
+    @NestRequest() req: RequestWithUser,
+  ) {
+    return this.productsService.findAll(req.user.companyId, query);
+  }
 
-    @Get(':id')
-    @ApiOperation({ summary: 'Get product by ID' })
-    @ApiResponse({ status: 200, description: 'Product found' })
-    @ApiResponse({ status: 404, description: 'Product not found' })
-    findOne(@Param('id') id: string, @NestRequest() req: RequestWithUser) {
-        return this.productsService.findOne(id, req.user.companyId);
-    }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get product by ID' })
+  @ApiResponse({ status: 200, description: 'Product found' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  findOne(@Param('id') id: string, @NestRequest() req: RequestWithUser) {
+    return this.productsService.findOne(id, req.user.companyId);
+  }
 
-    @Get('barcode/:barcode')
-    @ApiOperation({ summary: 'Find product by barcode' })
-    @ApiResponse({ status: 200, description: 'Product found' })
-    findByBarcode(@Param('barcode') barcode: string, @NestRequest() req: RequestWithUser) {
-        return this.productsService.findByBarcode(barcode, req.user.companyId);
-    }
+  @Get('barcode/:barcode')
+  @ApiOperation({ summary: 'Find product by barcode' })
+  @ApiResponse({ status: 200, description: 'Product found' })
+  findByBarcode(
+    @Param('barcode') barcode: string,
+    @NestRequest() req: RequestWithUser,
+  ) {
+    return this.productsService.findByBarcode(barcode, req.user.companyId);
+  }
 
-    @Patch(':id')
-    @ApiOperation({ summary: 'Update product' })
-    @ApiResponse({ status: 200, description: 'Product updated successfully' })
-    @ApiResponse({ status: 404, description: 'Product not found' })
-    update(
-        @Param('id') id: string,
-        @Body() updateProductDto: UpdateProductDto,
-        @NestRequest() req: RequestWithUser,
-    ) {
-        return this.productsService.update(
-            id,
-            req.user.companyId,
-            updateProductDto,
-            req.user.userId,
-        );
-    }
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update product' })
+  @ApiResponse({ status: 200, description: 'Product updated successfully' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @NestRequest() req: RequestWithUser,
+  ) {
+    return this.productsService.update(
+      id,
+      req.user.companyId,
+      updateProductDto,
+      req.user.userId,
+    );
+  }
 
-    @Delete(':id')
-    @ApiOperation({ summary: 'Delete product (soft delete)' })
-    @ApiResponse({ status: 200, description: 'Product deleted successfully' })
-    @ApiResponse({ status: 404, description: 'Product not found' })
-    remove(@Param('id') id: string, @NestRequest() req: RequestWithUser) {
-        return this.productsService.remove(id, req.user.companyId);
-    }
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete product (soft delete)' })
+  @ApiResponse({ status: 200, description: 'Product deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  remove(@Param('id') id: string, @NestRequest() req: RequestWithUser) {
+    return this.productsService.remove(id, req.user.companyId);
+  }
 }

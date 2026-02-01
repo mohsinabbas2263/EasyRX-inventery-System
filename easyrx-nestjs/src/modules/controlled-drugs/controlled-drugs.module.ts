@@ -5,8 +5,8 @@ import { ControlledDrugsService } from './controlled-drugs.service';
 import { ControlledDrugsController } from './controlled-drugs.controller';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ControlledDispenseLog])],
-    controllers: [ControlledDrugsController],
-    providers: [ControlledDrugsService],
+  imports: [TypeOrmModule.forFeature([ControlledDispenseLog])],
+  controllers: [ControlledDrugsController],
+  providers: [ControlledDrugsService],
 })
-export class ControlledDrugsModule { }
+export class ControlledDrugsModule {}
