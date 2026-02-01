@@ -8,6 +8,7 @@ import { PrescriptionLine } from './entities/prescription-line.entity';
 import { CreateCustomerDto } from './dto/customer.dto';
 import { CreatePrescriberDto } from './dto/prescriber.dto';
 import { CreatePrescriptionDto } from './dto/prescription.dto';
+import { TenantContextService } from '../../common/services/tenant-context.service';
 
 @Injectable()
 export class PharmacyService {
@@ -20,27 +21,38 @@ export class PharmacyService {
     private readonly prescriptionRepository: Repository<Prescription>,
     @InjectRepository(PrescriptionLine)
     private readonly lineRepository: Repository<PrescriptionLine>,
+    private readonly tenantContext: TenantContextService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   // --- Customers ---
   async createCustomer(dto: CreateCustomerDto): Promise<Customer> {
-    const customer = this.customerRepository.create(dto);
+    const customer = this.customerRepository.create({
+      ...dto,
+      companyId: this.tenantContext.companyId!
+    });
     return await this.customerRepository.save(customer);
   }
 
-  async findAllCustomers(companyId: string): Promise<Customer[]> {
-    return await this.customerRepository.find({ where: { companyId } });
+  async findAllCustomers(): Promise<Customer[]> {
+    return await this.customerRepository.find({
+      where: { companyId: this.tenantContext.companyId }
+    });
   }
 
   // --- Prescribers ---
   async createPrescriber(dto: CreatePrescriberDto): Promise<Prescriber> {
-    const prescriber = this.prescriberRepository.create(dto);
+    const prescriber = this.prescriberRepository.create({
+      ...dto,
+      companyId: this.tenantContext.companyId!
+    });
     return await this.prescriberRepository.save(prescriber);
   }
 
-  async findAllPrescribers(companyId: string): Promise<Prescriber[]> {
-    return await this.prescriberRepository.find({ where: { companyId } });
+  async findAllPrescribers(): Promise<Prescriber[]> {
+    return await this.prescriberRepository.find({
+      where: { companyId: this.tenantContext.companyId }
+    });
   }
 
   // --- Prescriptions ---

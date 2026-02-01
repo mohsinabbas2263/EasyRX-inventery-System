@@ -20,6 +20,8 @@ import { AccountingModule } from './modules/accounting/accounting.module';
 import { HealthController } from './health.controller';
 import { JwtAuthGuard } from './modules/security/guards/jwt-auth.guard';
 import { AuditInterceptor } from './modules/security/interceptors/audit.interceptor';
+import { SharedModule } from './common/shared.module';
+import { TenantInterceptor } from './common/interceptors/tenant.interceptor';
 
 import { validate } from './config/env.validation';
 
@@ -30,6 +32,7 @@ import { validate } from './config/env.validation';
       envFilePath: '.env',
       validate,
     }),
+    SharedModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -94,8 +97,12 @@ import { validate } from './config/env.validation';
     },
     {
       provide: APP_INTERCEPTOR,
+      useClass: TenantInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
       useClass: AuditInterceptor,
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

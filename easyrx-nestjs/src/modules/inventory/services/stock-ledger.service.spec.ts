@@ -3,6 +3,7 @@ import { StockLedgerService } from './stock-ledger.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { InventoryLedger } from '../entities/inventory-ledger.entity';
 import { ProductBatch } from '../../products/entities/product-batch.entity';
+import { TenantContextService } from '../../../common/services/tenant-context.service';
 import { DataSource } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
 
@@ -14,6 +15,12 @@ describe('StockLedgerService', () => {
         create: jest.fn(),
         save: jest.fn(),
         createQueryBuilder: jest.fn(),
+    };
+
+    const mockTenantContextService = {
+        companyId: 'TEST-COMP',
+        branchId: 'TEST-BR',
+        userId: 'TEST-USER',
     };
 
     const mockDataSource = {
@@ -43,6 +50,10 @@ describe('StockLedgerService', () => {
                 {
                     provide: getRepositoryToken(InventoryLedger),
                     useValue: mockLedgerRepository,
+                },
+                {
+                    provide: TenantContextService,
+                    useValue: mockTenantContextService,
                 },
                 {
                     provide: DataSource,

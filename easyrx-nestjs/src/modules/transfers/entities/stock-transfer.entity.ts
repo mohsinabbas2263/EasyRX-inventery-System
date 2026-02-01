@@ -5,7 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  OneToMany,
 } from 'typeorm';
+import { StockTransferLine } from './stock-transfer-line.entity';
 
 @Entity('stock_transfers')
 @Index(['companyId', 'fromBranchId'])
@@ -15,12 +17,15 @@ export class StockTransfer {
   transferId!: string;
 
   @Column({ name: 'company_id', type: 'uuid' })
+  @Index()
   companyId!: string;
 
   @Column({ name: 'from_branch_id', type: 'uuid' })
+  @Index()
   fromBranchId!: string;
 
   @Column({ name: 'to_branch_id', type: 'uuid' })
+  @Index()
   toBranchId!: string;
 
   @Column({ name: 'transfer_number', length: 50, unique: true })
@@ -35,6 +40,9 @@ export class StockTransfer {
   @Column({ type: 'text', nullable: true })
   notes?: string;
 
+  @OneToMany(() => StockTransferLine, (line) => line.transfer)
+  lines!: StockTransferLine[];
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
@@ -42,6 +50,7 @@ export class StockTransfer {
   updatedAt!: Date;
 
   @Column({ name: 'created_by', type: 'uuid' })
+  @Index()
   createdBy!: string;
 
   @Column({ name: 'received_by', type: 'uuid', nullable: true })

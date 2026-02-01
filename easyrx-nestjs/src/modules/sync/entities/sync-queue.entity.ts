@@ -13,20 +13,23 @@ export class SyncQueue {
   @PrimaryGeneratedColumn('uuid', { name: 'sync_id' })
   syncId!: string;
 
+  @Column({ name: 'company_id', type: 'uuid' })
+  companyId!: string;
+
   @Column({ name: 'branch_id', type: 'uuid' })
   branchId!: string;
 
   @Column({ name: 'document_type', length: 50 })
-  documentType!: string; // 'SALE', 'ADJUSTMENT', 'PURCHASE', etc.
+  documentType!: string;
 
-  @Column({ name: 'document_id', type: 'uuid' })
-  documentId!: string;
+  @Column({ name: 'local_uuid', type: 'uuid', unique: true })
+  localUuid!: string;
 
   @Column({ name: 'payload', type: 'jsonb' })
   payload!: any;
 
   @Column({ length: 20, default: 'PENDING' })
-  status!: string; // 'PENDING', 'SYNCED', 'FAILED', 'CONFLICT'
+  status!: string;
 
   @Column({ default: 0 })
   priority!: number;

@@ -4,13 +4,15 @@ import { DataSource } from 'typeorm';
 // import { Cache } from 'cache-manager';
 import { MovementType } from '../entities/inventory-ledger.entity';
 import { StockQueryDto } from '../dto/stock-query.dto';
+import { TenantContextService } from '../../../common/services/tenant-context.service';
 
 @Injectable()
 export class StockService {
   constructor(
     private dataSource: DataSource,
+    private tenantContext: TenantContextService,
     // @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  ) { }
 
   async getCurrentStock(query: StockQueryDto): Promise<any[]> {
     // const cacheKey = `stock:${JSON.stringify(query)}`;
@@ -28,7 +30,12 @@ export class StockService {
       ])
       .from('inventory_ledger', 'il')
       .leftJoin('products', 'p', 'p.id = il.product_id')
-      .where('il.branch_id = :branchId', { branchId: query.branchId });
+      .where('il.company_id = :companyId', {
+        companyId: this.tenantContext.companyId,
+      })
+      .andWhere('il.branch_id = :branchId', {
+        branchId: query.branchId || this.tenantContext.branchId,
+      });
 
     if (query.productId) {
       qb.andWhere('il.product_id = :productId', { productId: query.productId });
@@ -146,7 +153,12 @@ export class StockService {
       .from('inventory_ledger', 'il')
       .leftJoin('products', 'p', 'p.id = il.product_id')
       .leftJoin('product_batches', 'pb', 'pb.id = il.batch_id')
-      .where('il.branch_id = :branchId', { branchId })
+      .where('il.company_id = :companyId', {
+        companyId: this.tenantContext.companyId,
+      })
+      .andWhere('il.branch_id = :branchId', {
+        branchId: branchId || this.tenantContext.branchId,
+      })
       .andWhere('pb.expiry_date IS NOT NULL')
       .andWhere('pb.expiry_date <= CURRENT_DATE + INTERVAL :days days', {
         days,
@@ -182,7 +194,12 @@ export class StockService {
       ])
       .from('inventory_ledger', 'il')
       .leftJoin('products', 'p', 'p.id = il.product_id')
-      .where('il.branch_id = :branchId', { branchId })
+      .where('il.company_id = :companyId', {
+        companyId: this.tenantContext.companyId,
+      })
+      .andWhere('il.branch_id = :branchId', {
+        branchId: branchId || this.tenantContext.branchId,
+      })
       .andWhere(
         'NOT EXISTS (SELECT 1 FROM inventory_ledger il2 WHERE il2.product_id = il.product_id AND il2.branch_id = il.branch_id AND il2.movement_type IN (:...outMovements) AND il2.posted_at > CURRENT_DATE - INTERVAL :days days)',
         {

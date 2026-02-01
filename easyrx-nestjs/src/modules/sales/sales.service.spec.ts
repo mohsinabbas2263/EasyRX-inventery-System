@@ -3,6 +3,7 @@ import { SalesService } from './sales.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { SalesInvoice } from './entities/sales-invoice.entity';
 import { SalesInvoiceLine } from './entities/sales-invoice-line.entity';
+import { TenantContextService } from '../../common/services/tenant-context.service';
 import { BatchSelectionService } from '../inventory/services/batch-selection.service';
 import { StockLedgerService } from '../inventory/services/stock-ledger.service';
 import { DataSource } from 'typeorm';
@@ -40,8 +41,10 @@ describe('SalesService', () => {
         },
     };
 
-    const mockDataSource = {
-        createQueryRunner: jest.fn().mockReturnValue(mockQueryRunner),
+    const mockTenantContextService = {
+        companyId: 'TEST-COMP',
+        branchId: 'TEST-BR',
+        userId: 'TEST-USER',
     };
 
     beforeEach(async () => {
@@ -63,6 +66,10 @@ describe('SalesService', () => {
                 {
                     provide: StockLedgerService,
                     useValue: mockStockLedgerService,
+                },
+                {
+                    provide: TenantContextService,
+                    useValue: mockTenantContextService,
                 },
                 {
                     provide: DataSource,

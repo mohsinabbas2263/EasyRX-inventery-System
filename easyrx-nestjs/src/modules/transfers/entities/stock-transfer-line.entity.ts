@@ -25,20 +25,44 @@ export class StockTransferLine {
   transferId!: string;
 
   @Column({ name: 'product_id', type: 'uuid' })
+  @Index()
   productId!: string;
 
-  @Column({ name: 'batch_id', type: 'uuid' })
-  batchId!: string;
+  @Column({ name: 'batch_id', type: 'uuid', nullable: true })
+  @Index()
+  batchId?: string;
 
   @Column({
+    name: 'qty_requested',
     type: 'decimal',
     precision: 10,
     scale: 2,
+    default: 0,
     transformer: numericTransformer,
   })
-  quantity!: number;
+  qtyRequested!: number;
 
-  @ManyToOne(() => StockTransfer)
+  @Column({
+    name: 'qty_dispatched',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: numericTransformer,
+  })
+  qtyDispatched!: number;
+
+  @Column({
+    name: 'qty_received',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: numericTransformer,
+  })
+  qtyReceived!: number;
+
+  @ManyToOne(() => StockTransfer, (transfer) => transfer.lines)
   @JoinColumn({ name: 'transfer_id' })
   transfer!: StockTransfer;
 

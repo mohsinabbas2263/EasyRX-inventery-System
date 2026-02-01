@@ -14,6 +14,7 @@ import { SalesQueryDto } from './dto/sales-query.dto';
 import { BatchSelectionService } from '../inventory/services/batch-selection.service';
 import { StockLedgerService } from '../inventory/services/stock-ledger.service';
 import { User } from '../users/entities/user.entity';
+import { TenantContextService } from '../../common/services/tenant-context.service';
 
 @Injectable()
 export class SalesService {
@@ -24,8 +25,9 @@ export class SalesService {
     private readonly lineRepository: Repository<SalesInvoiceLine>,
     private readonly batchSelectionService: BatchSelectionService,
     private readonly stockLedgerService: StockLedgerService,
+    private readonly tenantContext: TenantContextService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async createSale(dto: CreateSaleDto, user: User): Promise<SalesInvoice> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -112,8 +114,10 @@ export class SalesService {
     }
   }
 
-  async findAll(query: SalesQueryDto, user: User) {
-    const where: FindOptionsWhere<SalesInvoice> = { companyId: user.companyId };
+  async findAll(query: SalesQueryDto) {
+    const where: FindOptionsWhere<SalesInvoice> = {
+      companyId: this.tenantContext.companyId
+    };
 
     if (query.branchId) {
       where.branchId = query.branchId;
@@ -140,9 +144,12 @@ export class SalesService {
     });
   }
 
-  async findOne(id: string, user: User) {
+  async findOne(id: string) {
     return this.invoiceRepository.findOne({
-      where: { saleId: id, companyId: user.companyId },
+      where: {
+        saleId: id,
+        companyId: this.tenantContext.companyId
+      },
     });
   }
 }

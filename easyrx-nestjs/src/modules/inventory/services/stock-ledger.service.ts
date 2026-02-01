@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, EntityManager } from 'typeorm';
 import { InventoryLedger } from '../entities/inventory-ledger.entity';
 import { ProductBatch } from '../../products/entities/product-batch.entity';
+import { TenantContextService } from '../../../common/services/tenant-context.service';
 
 export interface StockMovement {
   productId: string;
@@ -22,8 +23,9 @@ export class StockLedgerService {
   constructor(
     @InjectRepository(InventoryLedger)
     private ledgerRepository: Repository<InventoryLedger>,
+    private readonly tenantContext: TenantContextService,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   /**
    * Post a stock movement to the ledger
@@ -102,6 +104,7 @@ export class StockLedgerService {
     // Create ledger entry
     const ledgerEntry = manager.create(InventoryLedger, {
       ...movement,
+      companyId: this.tenantContext.companyId!,
       qtyIn: movement.qtyIn || 0,
       qtyOut: movement.qtyOut || 0,
       postedAt: new Date(),
@@ -152,6 +155,7 @@ export class StockLedgerService {
       .innerJoin(ProductBatch, 'batch', 'batch.batch_id = ledger.batch_id')
       .where('ledger.product_id = :productId', { productId })
       .andWhere('ledger.branch_id = :branchId', { branchId })
+      .andWhere('ledger.company_id = :companyId', { companyId: this.tenantContext.companyId })
       .groupBy('ledger.batch_id')
       .addGroupBy('batch.batch_no')
       .having(
