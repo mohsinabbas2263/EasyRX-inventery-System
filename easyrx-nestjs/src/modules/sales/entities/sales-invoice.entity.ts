@@ -1,66 +1,95 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    UpdateDateColumn,
+    Index,
+} from 'typeorm';
 
 const numericTransformer = {
     to: (value: number | null) => value,
-    from: (value: string | null) => value === null ? null : parseFloat(value),
+    from: (value: string | null) => (value === null ? null : parseFloat(value)),
 };
 
 @Entity('sales_invoices')
+@Index(['companyId', 'branchId', 'saleDate'])
+@Index(['saleNumber'], { unique: true })
 export class SalesInvoice {
-    @PrimaryGeneratedColumn('uuid', { name: 'id' })
-    id: string;
+    @PrimaryGeneratedColumn('uuid', { name: 'sale_id' })
+    saleId!: string;
 
     @Column({ name: 'company_id', type: 'uuid' })
-    companyId: string;
+    companyId!: string;
 
     @Column({ name: 'branch_id', type: 'uuid' })
-    branchId: string;
-
-    @Column({ name: 'counter_id', type: 'uuid', nullable: true })
-    counterId: string;
+    branchId!: string;
 
     @Column({ name: 'customer_id', type: 'uuid', nullable: true })
-    customerId: string;
+    customerId?: string;
 
-    @Column({ name: 'prescription_id', type: 'uuid', nullable: true })
-    prescriptionId: string;
+    @Column({ name: 'sale_number', length: 50 })
+    saleNumber!: string;
 
-    @Column({ name: 'sale_number', length: 50, nullable: true })
-    saleNumber: string;
+    @Column({ name: 'sale_date', type: 'timestamp' })
+    saleDate!: Date;
 
-    @Column({ name: 'sale_date', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-    saleDate: Date;
+    @Column({
+        name: 'gross_total',
+        type: 'decimal',
+        precision: 14,
+        scale: 2,
+        transformer: numericTransformer,
+    })
+    grossTotal!: number;
 
-    @Column({ name: 'gross_total', type: 'numeric', precision: 14, scale: 2, nullable: true, transformer: numericTransformer })
-    grossTotal: number | null;
+    @Column({
+        name: 'discount_total',
+        type: 'decimal',
+        precision: 14,
+        scale: 2,
+        transformer: numericTransformer,
+        default: 0,
+    })
+    discountTotal!: number;
 
-    @Column({ name: 'discount_total', type: 'numeric', precision: 14, scale: 2, nullable: true, transformer: numericTransformer })
-    discountTotal: number | null;
+    @Column({
+        name: 'tax_total',
+        type: 'decimal',
+        precision: 14,
+        scale: 2,
+        transformer: numericTransformer,
+        default: 0,
+    })
+    taxTotal!: number;
 
-    @Column({ name: 'tax_total', type: 'numeric', precision: 14, scale: 2, nullable: true, transformer: numericTransformer })
-    taxTotal: number | null;
+    @Column({
+        name: 'net_total',
+        type: 'decimal',
+        precision: 14,
+        scale: 2,
+        transformer: numericTransformer,
+    })
+    netTotal!: number;
 
-    @Column({ name: 'net_total', type: 'numeric', precision: 14, scale: 2, nullable: true, transformer: numericTransformer })
-    netTotal: number | null;
+    @Column({ name: 'payment_method', length: 30 })
+    paymentMethod!: string; // 'CASH', 'CARD', 'CREDIT'
 
-    @Column({ name: 'cost_of_goods_sold', type: 'numeric', precision: 14, scale: 2, nullable: true, transformer: numericTransformer })
-    costOfGoodsSold: number | null;
+    @Column({ length: 30, default: 'DRAFT' })
+    status!: string; // 'DRAFT', 'POSTED', 'CANCELLED'
 
-    @Column({ name: 'payment_method', length: 30, nullable: true })
-    paymentMethod: string;
-
-    @Column({ name: 'status', length: 30, default: 'DRAFT' })
-    status: string;
-
-    @Column({ name: 'created_by', type: 'uuid', nullable: true })
-    createdBy: string;
-
-    @Column({ name: 'posted_at', type: 'timestamptz', nullable: true })
-    postedAt: Date;
+    @Column({ name: 'local_uuid', type: 'uuid', nullable: true, unique: true })
+    localUuid?: string; // For offline sync mapping
 
     @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+    createdAt!: Date;
 
     @UpdateDateColumn({ name: 'updated_at' })
-    updatedAt: Date;
+    updatedAt!: Date;
+
+    @Column({ name: 'created_by', type: 'uuid' })
+    createdBy!: string;
+
+    @Column({ name: 'updated_by', type: 'uuid', nullable: true })
+    updatedBy?: string;
 }

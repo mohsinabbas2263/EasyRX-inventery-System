@@ -15,6 +15,8 @@ import { PermissionsGuard } from './guards/permissions.guard';
 import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { AuditLog } from './entities/audit-log.entity';
 import { UserPermission } from './entities/user-permission.entity';
+import { Permission } from './entities/permission.entity';
+import { RefreshToken } from './entities/refresh-token.entity';
 import { User } from '../users/entities/user.entity';
 
 @Module({
@@ -29,7 +31,13 @@ import { User } from '../users/entities/user.entity';
                 signOptions: { expiresIn: '24h' },
             }),
         }),
-        TypeOrmModule.forFeature([AuditLog, UserPermission, User]),
+        TypeOrmModule.forFeature([
+            AuditLog,
+            UserPermission,
+            Permission,
+            RefreshToken,
+            User,
+        ]),
     ],
     controllers: [AuthController, PermissionsController, AuditController],
     providers: [

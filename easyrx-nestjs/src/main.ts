@@ -2,12 +2,18 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
     const logger = new Logger('Bootstrap');
     const app = await NestFactory.create(AppModule);
+
+    // Security Headers
+    // Configure helmet to allow cross-origin resources, as CORS is handled by app.enableCors()
+    app.use(helmet({ crossOriginResourcePolicy: false }));
+
     const configService = app.get(ConfigService);
 
     // Global validation

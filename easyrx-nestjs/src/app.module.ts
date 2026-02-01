@@ -11,15 +11,24 @@ import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { PurchaseModule } from './modules/purchase/purchase.module';
+import { CompaniesModule } from './modules/companies/companies.module';
+import { BranchesModule } from './modules/branches/branches.module';
+import { PharmacyModule } from './modules/pharmacy/pharmacy.module';
+import { TransfersModule } from './modules/transfers/transfers.module';
+import { SyncModule } from './modules/sync/sync.module';
+import { AccountingModule } from './modules/accounting/accounting.module';
 import { HealthController } from './health.controller';
 import { JwtAuthGuard } from './modules/security/guards/jwt-auth.guard';
 import { AuditInterceptor } from './modules/security/interceptors/audit.interceptor';
+
+import { validate } from './config/env.validation';
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: '.env',
+            validate,
         }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
@@ -46,8 +55,14 @@ import { AuditInterceptor } from './modules/security/interceptors/audit.intercep
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => [
                 {
-                    ttl: configService.get<number>('THROTTLE_TTL', 60),
-                    limit: configService.get<number>('THROTTLE_LIMIT', 10),
+                    name: 'short',
+                    ttl: configService.get<number>('THROTTLE_TTL_SHORT', 1000),
+                    limit: configService.get<number>('THROTTLE_LIMIT_SHORT', 3),
+                },
+                {
+                    name: 'long',
+                    ttl: configService.get<number>('THROTTLE_TTL_LONG', 60000),
+                    limit: configService.get<number>('THROTTLE_LIMIT_LONG', 100),
                 },
             ],
         }),
@@ -60,6 +75,12 @@ import { AuditInterceptor } from './modules/security/interceptors/audit.intercep
         SalesModule,
         PurchaseModule,
         ReportsModule,
+        CompaniesModule,
+        BranchesModule,
+        PharmacyModule,
+        TransfersModule,
+        SyncModule,
+        AccountingModule,
     ],
     controllers: [HealthController],
     providers: [

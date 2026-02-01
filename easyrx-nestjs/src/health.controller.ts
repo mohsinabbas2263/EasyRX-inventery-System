@@ -1,16 +1,42 @@
 import { Controller, Get } from '@nestjs/common';
-import { Public } from './modules/security/guards/jwt-auth.guard';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Public } from './modules/security/decorators/public.decorator';
 
+@ApiTags('health')
 @Controller('health')
 export class HealthController {
     @Get()
     @Public()
-    health() {
+    @ApiOperation({ summary: 'Health check endpoint' })
+    @ApiResponse({ status: 200, description: 'Service is healthy' })
+    check() {
         return {
             status: 'ok',
             timestamp: new Date().toISOString(),
-            service: 'EazyRX Backend',
-            version: '1.0.0',
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV || 'development',
+        };
+    }
+
+    @Get('ready')
+    @Public()
+    @ApiOperation({ summary: 'Readiness probe' })
+    @ApiResponse({ status: 200, description: 'Service is ready to accept traffic' })
+    ready() {
+        return {
+            status: 'ready',
+            timestamp: new Date().toISOString(),
+        };
+    }
+
+    @Get('live')
+    @Public()
+    @ApiOperation({ summary: 'Liveness probe' })
+    @ApiResponse({ status: 200, description: 'Service is alive' })
+    live() {
+        return {
+            status: 'alive',
+            timestamp: new Date().toISOString(),
         };
     }
 }

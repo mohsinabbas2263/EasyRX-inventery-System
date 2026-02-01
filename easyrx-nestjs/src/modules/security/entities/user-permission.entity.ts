@@ -1,22 +1,38 @@
-import { Entity, Column, ManyToOne, JoinColumn, CreateDateColumn, Index, PrimaryColumn } from 'typeorm';
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    ManyToOne,
+    JoinColumn,
+    Index,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Permission } from './permission.entity';
 
 @Entity('user_permissions')
-@Index('idx_user_permissions_user', ['userId'])
+@Index(['userId', 'permissionId'], { unique: true })
 export class UserPermission {
-    @PrimaryColumn({ type: 'uuid' })
-    userId: string;
+    @PrimaryGeneratedColumn('uuid', { name: 'user_permission_id' })
+    userPermissionId!: string;
 
-    @PrimaryColumn({ type: 'varchar', length: 100 })
-    permissionCode: string;
+    @Column({ name: 'user_id', type: 'uuid' })
+    userId!: string;
 
-    @Column({ type: 'uuid', nullable: true })
-    grantedBy: string;
+    @Column({ name: 'permission_id', type: 'uuid' })
+    permissionId!: string;
 
-    @CreateDateColumn()
-    grantedAt: Date;
+    @Column({ name: 'branch_id', type: 'uuid', nullable: true })
+    branchId?: string; // Optional: restrict permission to a specific branch
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'userId' })
-    user: User;
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt!: Date;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'user_id' })
+    user!: User;
+
+    @ManyToOne(() => Permission)
+    @JoinColumn({ name: 'permission_id' })
+    permission!: Permission;
 }
