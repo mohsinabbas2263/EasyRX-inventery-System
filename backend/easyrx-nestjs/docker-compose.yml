@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # EazyRX NestJS API
+  easyrx-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: easyrx-api
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_HOST=easyrx-db
+      - REDIS_HOST=easyrx-redis
+    depends_on:
+      easyrx-db:
+        condition: service_healthy
+      easyrx-redis:
+        condition: service_healthy
+    networks:
+      - easyrx-network
+
+  # PostgreSQL Database
+  easyrx-db:
+    image: postgres:15-alpine
+    container_name: easyrx-db
+    environment:
+      - POSTGRES_USER=${DATABASE_USER:-postgres}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME:-easyrx}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - easyrx-network
+
+  # Redis for Throttling/Caching
+  easyrx-redis:
+    image: redis:7-alpine
+    container_name: easyrx-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - easyrx-network
+
+networks:
+  easyrx-network:
+    driver: bridge
+
+volumes:
+  db-data:

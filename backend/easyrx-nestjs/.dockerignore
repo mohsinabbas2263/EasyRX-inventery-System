@@ -1,0 +1,14 @@
+node_modules
+dist
+npm-debug.log
+mercurial.ini
+.git
+.env
+.debug
+.vscode
+*.md
+coverage
+test
+docker-compose.yml
+Dockerfile
+.dockerignore

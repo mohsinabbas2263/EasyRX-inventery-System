@@ -1,0 +1,737 @@
+﻿{
+    "openapi":  "3.0.0",
+    "paths":  {
+                  "/api/health":  {
+                                      "get":  {
+                                                  "operationId":  "HealthController_health",
+                                                  "parameters":  [
+
+                                                                 ],
+                                                  "responses":  {
+                                                                    "200":  {
+                                                                                "description":  ""
+                                                                            }
+                                                                },
+                                                  "tags":  [
+                                                               "Health"
+                                                           ]
+                                              }
+                                  },
+                  "/api/api/v1/auth/login":  {
+                                                 "post":  {
+                                                              "operationId":  "AuthController_login",
+                                                              "parameters":  [
+
+                                                                             ],
+                                                              "requestBody":  {
+                                                                                  "required":  true,
+                                                                                  "content":  {
+                                                                                                  "application/json":  {
+                                                                                                                           "schema":  {
+                                                                                                                                          "$ref":  "#/components/schemas/LoginDto"
+                                                                                                                                      }
+                                                                                                                       }
+                                                                                              }
+                                                                              },
+                                                              "responses":  {
+                                                                                "200":  {
+                                                                                            "description":  "",
+                                                                                            "content":  {
+                                                                                                            "application/json":  {
+                                                                                                                                     "schema":  {
+                                                                                                                                                    "$ref":  "#/components/schemas/LoginResponseDto"
+                                                                                                                                                }
+                                                                                                                                 }
+                                                                                                        }
+                                                                                        }
+                                                                            },
+                                                              "summary":  "User login",
+                                                              "tags":  [
+                                                                           "Authentication"
+                                                                       ]
+                                                          }
+                                             },
+                  "/api/api/v1/permissions":  {
+                                                  "get":  {
+                                                              "operationId":  "PermissionsController_getAllPermissions",
+                                                              "parameters":  [
+
+                                                                             ],
+                                                              "responses":  {
+                                                                                "200":  {
+                                                                                            "description":  ""
+                                                                                        }
+                                                                            },
+                                                              "tags":  [
+                                                                           "Permissions"
+                                                                       ]
+                                                          }
+                                              },
+                  "/api/api/v1/permissions/assign":  {
+                                                         "post":  {
+                                                                      "operationId":  "PermissionsController_assignPermissions",
+                                                                      "parameters":  [
+
+                                                                                     ],
+                                                                      "requestBody":  {
+                                                                                          "required":  true,
+                                                                                          "content":  {
+                                                                                                          "application/json":  {
+                                                                                                                                   "schema":  {
+                                                                                                                                                  "$ref":  "#/components/schemas/AssignPermissionsDto"
+                                                                                                                                              }
+                                                                                                                               }
+                                                                                                      }
+                                                                                      },
+                                                                      "responses":  {
+                                                                                        "201":  {
+                                                                                                    "description":  ""
+                                                                                                }
+                                                                                    },
+                                                                      "tags":  [
+                                                                                   "Permissions"
+                                                                               ]
+                                                                  }
+                                                     },
+                  "/api/api/v1/audit":  {
+                                            "get":  {
+                                                        "operationId":  "AuditController_getAuditLogs",
+                                                        "parameters":  [
+                                                                           {
+                                                                               "name":  "from",
+                                                                               "required":  true,
+                                                                               "in":  "query",
+                                                                               "schema":  {
+                                                                                              "type":  "string"
+                                                                                          }
+                                                                           },
+                                                                           {
+                                                                               "name":  "to",
+                                                                               "required":  true,
+                                                                               "in":  "query",
+                                                                               "schema":  {
+                                                                                              "type":  "string"
+                                                                                          }
+                                                                           },
+                                                                           {
+                                                                               "name":  "userId",
+                                                                               "required":  true,
+                                                                               "in":  "query",
+                                                                               "schema":  {
+                                                                                              "type":  "string"
+                                                                                          }
+                                                                           },
+                                                                           {
+                                                                               "name":  "action",
+                                                                               "required":  true,
+                                                                               "in":  "query",
+                                                                               "schema":  {
+                                                                                              "type":  "string"
+                                                                                          }
+                                                                           },
+                                                                           {
+                                                                               "name":  "limit",
+                                                                               "required":  true,
+                                                                               "in":  "query",
+                                                                               "schema":  {
+                                                                                              "type":  "string"
+                                                                                          }
+                                                                           },
+                                                                           {
+                                                                               "name":  "offset",
+                                                                               "required":  true,
+                                                                               "in":  "query",
+                                                                               "schema":  {
+                                                                                              "type":  "string"
+                                                                                          }
+                                                                           }
+                                                                       ],
+                                                        "responses":  {
+                                                                          "200":  {
+                                                                                      "description":  ""
+                                                                                  }
+                                                                      },
+                                                        "tags":  [
+                                                                     "Audit"
+                                                                 ]
+                                                    }
+                                        },
+                  "/api/api/v1/audit/export":  {
+                                                   "get":  {
+                                                               "operationId":  "AuditController_exportAuditCsv",
+                                                               "parameters":  [
+                                                                                  {
+                                                                                      "name":  "from",
+                                                                                      "required":  true,
+                                                                                      "in":  "query",
+                                                                                      "schema":  {
+                                                                                                     "type":  "string"
+                                                                                                 }
+                                                                                  },
+                                                                                  {
+                                                                                      "name":  "to",
+                                                                                      "required":  true,
+                                                                                      "in":  "query",
+                                                                                      "schema":  {
+                                                                                                     "type":  "string"
+                                                                                                 }
+                                                                                  },
+                                                                                  {
+                                                                                      "name":  "userId",
+                                                                                      "required":  true,
+                                                                                      "in":  "query",
+                                                                                      "schema":  {
+                                                                                                     "type":  "string"
+                                                                                                 }
+                                                                                  },
+                                                                                  {
+                                                                                      "name":  "action",
+                                                                                      "required":  true,
+                                                                                      "in":  "query",
+                                                                                      "schema":  {
+                                                                                                     "type":  "string"
+                                                                                                 }
+                                                                                  }
+                                                                              ],
+                                                               "responses":  {
+                                                                                 "200":  {
+                                                                                             "description":  ""
+                                                                                         }
+                                                                             },
+                                                               "tags":  [
+                                                                            "Audit"
+                                                                        ]
+                                                           }
+                                               },
+                  "/api/api/v1/users":  {
+                                            "get":  {
+                                                        "operationId":  "UsersController_findAll",
+                                                        "parameters":  [
+
+                                                                       ],
+                                                        "responses":  {
+                                                                          "200":  {
+                                                                                      "description":  ""
+                                                                                  }
+                                                                      },
+                                                        "tags":  [
+                                                                     "Users"
+                                                                 ]
+                                                    }
+                                        },
+                  "/api/api/v1/users/{id}/role":  {
+                                                      "patch":  {
+                                                                    "operationId":  "UsersController_updateRole",
+                                                                    "parameters":  [
+                                                                                       {
+                                                                                           "name":  "id",
+                                                                                           "required":  true,
+                                                                                           "in":  "path",
+                                                                                           "schema":  {
+                                                                                                          "type":  "string"
+                                                                                                      }
+                                                                                       }
+                                                                                   ],
+                                                                    "responses":  {
+                                                                                      "200":  {
+                                                                                                  "description":  ""
+                                                                                              }
+                                                                                  },
+                                                                    "tags":  [
+                                                                                 "Users"
+                                                                             ]
+                                                                }
+                                                  },
+                  "/api/api/v1/inventory/stock":  {
+                                                      "get":  {
+                                                                  "operationId":  "StockController_getStock",
+                                                                  "parameters":  [
+
+                                                                                 ],
+                                                                  "responses":  {
+                                                                                    "200":  {
+                                                                                                "description":  ""
+                                                                                            }
+                                                                                },
+                                                                  "security":  [
+                                                                                   {
+                                                                                       "bearer":  [
+
+                                                                                                  ]
+                                                                                   }
+                                                                               ],
+                                                                  "summary":  "Get current stock",
+                                                                  "tags":  [
+                                                                               "Inventory"
+                                                                           ]
+                                                              }
+                                                  },
+                  "/api/api/v1/inventory/stock/near-expiry":  {
+                                                                  "get":  {
+                                                                              "operationId":  "StockController_getNearExpiry",
+                                                                              "parameters":  [
+                                                                                                 {
+                                                                                                     "name":  "branchId",
+                                                                                                     "required":  true,
+                                                                                                     "in":  "query",
+                                                                                                     "schema":  {
+                                                                                                                    "type":  "string"
+                                                                                                                }
+                                                                                                 },
+                                                                                                 {
+                                                                                                     "name":  "days",
+                                                                                                     "required":  true,
+                                                                                                     "in":  "query",
+                                                                                                     "schema":  {
+                                                                                                                    "type":  "number"
+                                                                                                                }
+                                                                                                 }
+                                                                                             ],
+                                                                              "responses":  {
+                                                                                                "200":  {
+                                                                                                            "description":  ""
+                                                                                                        }
+                                                                                            },
+                                                                              "security":  [
+                                                                                               {
+                                                                                                   "bearer":  [
+
+                                                                                                              ]
+                                                                                               }
+                                                                                           ],
+                                                                              "summary":  "Get near-expiry batches",
+                                                                              "tags":  [
+                                                                                           "Inventory"
+                                                                                       ]
+                                                                          }
+                                                              },
+                  "/api/api/v1/inventory/stock/dead-stock":  {
+                                                                 "get":  {
+                                                                             "operationId":  "StockController_getDeadStock",
+                                                                             "parameters":  [
+                                                                                                {
+                                                                                                    "name":  "branchId",
+                                                                                                    "required":  true,
+                                                                                                    "in":  "query",
+                                                                                                    "schema":  {
+                                                                                                                   "type":  "string"
+                                                                                                               }
+                                                                                                },
+                                                                                                {
+                                                                                                    "name":  "minDays",
+                                                                                                    "required":  true,
+                                                                                                    "in":  "query",
+                                                                                                    "schema":  {
+                                                                                                                   "type":  "number"
+                                                                                                               }
+                                                                                                },
+                                                                                                {
+                                                                                                    "name":  "minQty",
+                                                                                                    "required":  true,
+                                                                                                    "in":  "query",
+                                                                                                    "schema":  {
+                                                                                                                   "type":  "number"
+                                                                                                               }
+                                                                                                }
+                                                                                            ],
+                                                                             "responses":  {
+                                                                                               "200":  {
+                                                                                                           "description":  ""
+                                                                                                       }
+                                                                                           },
+                                                                             "security":  [
+                                                                                              {
+                                                                                                  "bearer":  [
+
+                                                                                                             ]
+                                                                                              }
+                                                                                          ],
+                                                                             "summary":  "Get dead stock report",
+                                                                             "tags":  [
+                                                                                          "Inventory"
+                                                                                      ]
+                                                                         }
+                                                             },
+                  "/api/api/v1/inventory/movements":  {
+                                                          "post":  {
+                                                                       "operationId":  "MovementController_createMovement",
+                                                                       "parameters":  [
+
+                                                                                      ],
+                                                                       "requestBody":  {
+                                                                                           "required":  true,
+                                                                                           "content":  {
+                                                                                                           "application/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/CreateMovementDto"
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                       }
+                                                                                       },
+                                                                       "responses":  {
+                                                                                         "201":  {
+                                                                                                     "description":  ""
+                                                                                                 }
+                                                                                     },
+                                                                       "tags":  [
+                                                                                    "Movement"
+                                                                                ]
+                                                                   }
+                                                      },
+                  "/api/api/v1/inventory/movements/cycle-count":  {
+                                                                      "post":  {
+                                                                                   "operationId":  "MovementController_applyCycleCount",
+                                                                                   "parameters":  [
+
+                                                                                                  ],
+                                                                                   "requestBody":  {
+                                                                                                       "required":  true,
+                                                                                                       "content":  {
+                                                                                                                       "application/json":  {
+                                                                                                                                                "schema":  {
+                                                                                                                                                               "$ref":  "#/components/schemas/CycleCountDto"
+                                                                                                                                                           }
+                                                                                                                                            }
+                                                                                                                   }
+                                                                                                   },
+                                                                                   "responses":  {
+                                                                                                     "201":  {
+                                                                                                                 "description":  ""
+                                                                                                             }
+                                                                                                 },
+                                                                                   "tags":  [
+                                                                                                "Movement"
+                                                                                            ]
+                                                                               }
+                                                                  },
+                  "/api/api/v1/inventory/movements/adjustment":  {
+                                                                     "post":  {
+                                                                                  "operationId":  "MovementController_createAdjustment",
+                                                                                  "parameters":  [
+
+                                                                                                 ],
+                                                                                  "requestBody":  {
+                                                                                                      "required":  true,
+                                                                                                      "content":  {
+                                                                                                                      "application/json":  {
+                                                                                                                                               "schema":  {
+                                                                                                                                                              "$ref":  "#/components/schemas/AdjustmentDto"
+                                                                                                                                                          }
+                                                                                                                                           }
+                                                                                                                  }
+                                                                                                  },
+                                                                                  "responses":  {
+                                                                                                    "201":  {
+                                                                                                                "description":  ""
+                                                                                                            }
+                                                                                                },
+                                                                                  "tags":  [
+                                                                                               "Movement"
+                                                                                           ]
+                                                                              }
+                                                                 },
+                  "/api/api/v1/inventory/config":  {
+                                                       "get":  {
+                                                                   "operationId":  "ConfigController_getConfig",
+                                                                   "parameters":  [
+
+                                                                                  ],
+                                                                   "responses":  {
+                                                                                     "200":  {
+                                                                                                 "description":  ""
+                                                                                             }
+                                                                                 },
+                                                                   "tags":  [
+                                                                                "Config"
+                                                                            ]
+                                                               },
+                                                       "post":  {
+                                                                    "operationId":  "ConfigController_createConfig",
+                                                                    "parameters":  [
+
+                                                                                   ],
+                                                                    "requestBody":  {
+                                                                                        "required":  true,
+                                                                                        "content":  {
+                                                                                                        "application/json":  {
+                                                                                                                                 "schema":  {
+                                                                                                                                                "$ref":  "#/components/schemas/InventoryConfigDto"
+                                                                                                                                            }
+                                                                                                                             }
+                                                                                                    }
+                                                                                    },
+                                                                    "responses":  {
+                                                                                      "201":  {
+                                                                                                  "description":  ""
+                                                                                              }
+                                                                                  },
+                                                                    "tags":  [
+                                                                                 "Config"
+                                                                             ]
+                                                                }
+                                                   },
+                  "/api/api/v1/inventory/config/{id}":  {
+                                                            "get":  {
+                                                                        "operationId":  "ConfigController_getConfigById",
+                                                                        "parameters":  [
+                                                                                           {
+                                                                                               "name":  "id",
+                                                                                               "required":  true,
+                                                                                               "in":  "path",
+                                                                                               "schema":  {
+                                                                                                              "type":  "string"
+                                                                                                          }
+                                                                                           }
+                                                                                       ],
+                                                                        "responses":  {
+                                                                                          "200":  {
+                                                                                                      "description":  ""
+                                                                                                  }
+                                                                                      },
+                                                                        "tags":  [
+                                                                                     "Config"
+                                                                                 ]
+                                                                    },
+                                                            "patch":  {
+                                                                          "operationId":  "ConfigController_updateConfig",
+                                                                          "parameters":  [
+                                                                                             {
+                                                                                                 "name":  "id",
+                                                                                                 "required":  true,
+                                                                                                 "in":  "path",
+                                                                                                 "schema":  {
+                                                                                                                "type":  "string"
+                                                                                                            }
+                                                                                             }
+                                                                                         ],
+                                                                          "responses":  {
+                                                                                            "200":  {
+                                                                                                        "description":  ""
+                                                                                                    }
+                                                                                        },
+                                                                          "tags":  [
+                                                                                       "Config"
+                                                                                   ]
+                                                                      },
+                                                            "delete":  {
+                                                                           "operationId":  "ConfigController_deleteConfig",
+                                                                           "parameters":  [
+                                                                                              {
+                                                                                                  "name":  "id",
+                                                                                                  "required":  true,
+                                                                                                  "in":  "path",
+                                                                                                  "schema":  {
+                                                                                                                 "type":  "string"
+                                                                                                             }
+                                                                                              }
+                                                                                          ],
+                                                                           "responses":  {
+                                                                                             "200":  {
+                                                                                                         "description":  ""
+                                                                                                     }
+                                                                                         },
+                                                                           "tags":  [
+                                                                                        "Config"
+                                                                                    ]
+                                                                       }
+                                                        },
+                  "/api/api/v1/reports/sales":  {
+                                                    "get":  {
+                                                                "operationId":  "ReportsController_getSalesReport",
+                                                                "parameters":  [
+
+                                                                               ],
+                                                                "responses":  {
+                                                                                  "200":  {
+                                                                                              "description":  ""
+                                                                                          }
+                                                                              },
+                                                                "tags":  [
+                                                                             "Reports"
+                                                                         ]
+                                                            }
+                                                },
+                  "/api/api/v1/reports/inventory/expiry":  {
+                                                               "get":  {
+                                                                           "operationId":  "ReportsController_getExpiryReport",
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "responses":  {
+                                                                                             "200":  {
+                                                                                                         "description":  ""
+                                                                                                     }
+                                                                                         },
+                                                                           "tags":  [
+                                                                                        "Reports"
+                                                                                    ]
+                                                                       }
+                                                           },
+                  "/api/api/v1/reports/inventory/aging":  {
+                                                              "get":  {
+                                                                          "operationId":  "ReportsController_getAgingReport",
+                                                                          "parameters":  [
+
+                                                                                         ],
+                                                                          "responses":  {
+                                                                                            "200":  {
+                                                                                                        "description":  ""
+                                                                                                    }
+                                                                                        },
+                                                                          "tags":  [
+                                                                                       "Reports"
+                                                                                   ]
+                                                                      }
+                                                          },
+                  "/api/api/v1/reports/purchase/supplier":  {
+                                                                "get":  {
+                                                                            "operationId":  "ReportsController_getSupplierReport",
+                                                                            "parameters":  [
+
+                                                                                           ],
+                                                                            "responses":  {
+                                                                                              "200":  {
+                                                                                                          "description":  ""
+                                                                                                      }
+                                                                                          },
+                                                                            "tags":  [
+                                                                                         "Reports"
+                                                                                     ]
+                                                                        }
+                                                            },
+                  "/api/api/v1/reports/staff/productivity":  {
+                                                                 "get":  {
+                                                                             "operationId":  "ReportsController_getProductivityReport",
+                                                                             "parameters":  [
+
+                                                                                            ],
+                                                                             "responses":  {
+                                                                                               "200":  {
+                                                                                                           "description":  ""
+                                                                                                       }
+                                                                                           },
+                                                                             "tags":  [
+                                                                                          "Reports"
+                                                                                      ]
+                                                                         }
+                                                             },
+                  "/api/api/v1/reports/export":  {
+                                                     "get":  {
+                                                                 "operationId":  "ReportsController_exportReport",
+                                                                 "parameters":  [
+                                                                                    {
+                                                                                        "name":  "type",
+                                                                                        "required":  true,
+                                                                                        "in":  "query",
+                                                                                        "schema":  {
+                                                                                                       "type":  "string"
+                                                                                                   }
+                                                                                    },
+                                                                                    {
+                                                                                        "name":  "format",
+                                                                                        "required":  true,
+                                                                                        "in":  "query",
+                                                                                        "schema":  {
+                                                                                                       "type":  "string"
+                                                                                                   }
+                                                                                    }
+                                                                                ],
+                                                                 "responses":  {
+                                                                                   "200":  {
+                                                                                               "description":  ""
+                                                                                           }
+                                                                               },
+                                                                 "tags":  [
+                                                                              "Reports"
+                                                                          ]
+                                                             }
+                                                 }
+              },
+    "info":  {
+                 "title":  "EazyRX API",
+                 "description":  "EazyRX - Hybrid SaaS Pharmacy Inventory System API",
+                 "version":  "1.0",
+                 "contact":  {
+
+                             }
+             },
+    "tags":  [
+
+             ],
+    "servers":  [
+
+                ],
+    "components":  {
+                       "securitySchemes":  {
+                                               "bearer":  {
+                                                              "scheme":  "bearer",
+                                                              "bearerFormat":  "JWT",
+                                                              "type":  "http"
+                                                          }
+                                           },
+                       "schemas":  {
+                                       "LoginDto":  {
+                                                        "type":  "object",
+                                                        "properties":  {
+                                                                           "email":  {
+                                                                                         "type":  "string",
+                                                                                         "example":  "admin@easyrx.com"
+                                                                                     },
+                                                                           "password":  {
+                                                                                            "type":  "string",
+                                                                                            "example":  "admin123"
+                                                                                        }
+                                                                       },
+                                                        "required":  [
+                                                                         "email",
+                                                                         "password"
+                                                                     ]
+                                                    },
+                                       "LoginResponseDto":  {
+                                                                "type":  "object",
+                                                                "properties":  {
+                                                                                   "accessToken":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                   "refreshToken":  {
+                                                                                                        "type":  "string"
+                                                                                                    }
+                                                                               },
+                                                                "required":  [
+                                                                                 "accessToken",
+                                                                                 "refreshToken"
+                                                                             ]
+                                                            },
+                                       "AssignPermissionsDto":  {
+                                                                    "type":  "object",
+                                                                    "properties":  {
+
+                                                                                   }
+                                                                },
+                                       "CreateMovementDto":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+
+                                                                                }
+                                                             },
+                                       "CycleCountDto":  {
+                                                             "type":  "object",
+                                                             "properties":  {
+
+                                                                            }
+                                                         },
+                                       "AdjustmentDto":  {
+                                                             "type":  "object",
+                                                             "properties":  {
+
+                                                                            }
+                                                         },
+                                       "InventoryConfigDto":  {
+                                                                  "type":  "object",
+                                                                  "properties":  {
+
+                                                                                 }
+                                                              }
+                                   }
+                   }
+}

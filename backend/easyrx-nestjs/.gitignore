@@ -1,0 +1,40 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+dist/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Misc
+.cache/
+temp/
+
+# Temporary and debug files
+*.tmp
+*.temp
+build_*.txt
+debug_*.log
