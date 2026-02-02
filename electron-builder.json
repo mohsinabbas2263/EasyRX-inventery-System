@@ -1,0 +1,53 @@
+{
+    "name": "eazyrx-pos-desktop",
+    "productName": "EazyRX POS",
+    "version": "1.0.0",
+    "description": "EazyRX Point of Sale Desktop Application",
+    "main": "electron/main.js",
+    "author": "EazyRX Team",
+    "license": "MIT",
+    "build": {
+        "appId": "com.eazyrx.pos",
+        "productName": "EazyRX POS",
+        "directories": {
+            "output": "dist-electron"
+        },
+        "files": [
+            "dist/**/*",
+            "electron/**/*",
+            "package.json"
+        ],
+        "win": {
+            "target": [
+                {
+                    "target": "nsis",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ],
+            "icon": "public/icon.ico",
+            "artifactName": "${productName}-Setup-${version}.${ext}"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true,
+            "shortcutName": "EazyRX POS"
+        },
+        "mac": {
+            "target": "dmg",
+            "icon": "public/icon.icns",
+            "category": "public.app-category.business"
+        },
+        "linux": {
+            "target": [
+                "AppImage",
+                "deb"
+            ],
+            "icon": "public/icon.png",
+            "category": "Office"
+        }
+    }
+}
