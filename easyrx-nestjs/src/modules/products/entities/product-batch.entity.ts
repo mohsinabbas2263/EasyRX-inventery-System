@@ -23,6 +23,9 @@ export class ProductBatch {
   @Column({ name: 'branch_id', type: 'uuid' })
   branchId: string;
 
+  @Column({ name: 'company_id', type: 'uuid', nullable: true })
+  companyId: string;
+
   @Column({ name: 'batch_no', length: 100 })
   batchNo: string;
 

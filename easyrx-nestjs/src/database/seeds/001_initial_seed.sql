@@ -48,4 +48,16 @@ BEGIN
     )
     ON CONFLICT (username) DO NOTHING;
 
+    -- 5. Create Chart of Accounts
+    INSERT INTO chart_of_accounts (company_id, account_code, account_name, account_type, is_active)
+    VALUES 
+        (v_company_id, '1000', 'Cash on Hand', 'ASSET', true),
+        (v_company_id, '1100', 'Accounts Receivable', 'ASSET', true),
+        (v_company_id, '1200', 'Inventory Asset', 'ASSET', true),
+        (v_company_id, '2000', 'Accounts Payable', 'LIABILITY', true),
+        (v_company_id, '3000', 'Owner Equity', 'EQUITY', true),
+        (v_company_id, '4000', 'Sales Income', 'REVENUE', true),
+        (v_company_id, '5000', 'Cost of Goods Sold', 'EXPENSE', true)
+    ON CONFLICT (company_id, account_code) DO NOTHING;
+
 END $$;

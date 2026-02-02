@@ -3,7 +3,6 @@ import {
   Post,
   Body,
   UseGuards,
-  Request as NestRequest,
   Get,
   Param,
   Query,
@@ -18,14 +17,13 @@ import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { SalesQueryDto } from './dto/sales-query.dto';
 import { JwtAuthGuard } from '../security/guards/jwt-auth.guard';
-import { RequestWithUser } from '../../common/interfaces/request-with-user.interface';
 
 @ApiTags('sales')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('sales')
 export class SalesController {
-  constructor(private readonly salesService: SalesService) {}
+  constructor(private readonly salesService: SalesService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new sale' })
@@ -34,19 +32,19 @@ export class SalesController {
     status: 400,
     description: 'Bad Request - Validation or Stock error',
   })
-  create(@Body() dto: CreateSaleDto, @NestRequest() req: RequestWithUser) {
-    return this.salesService.createSale(dto, req.user as any);
+  create(@Body() dto: CreateSaleDto) {
+    return this.salesService.createSale(dto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all sales for the company' })
-  findAll(@Query() query: SalesQueryDto, @NestRequest() req: RequestWithUser) {
-    return this.salesService.findAll(query, req.user as any);
+  findAll(@Query() query: SalesQueryDto) {
+    return this.salesService.findAll(query);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a specific sale' })
-  findOne(@Param('id') id: string, @NestRequest() req: RequestWithUser) {
-    return this.salesService.findOne(id, req.user as any);
+  findOne(@Param('id') id: string) {
+    return this.salesService.findOne(id);
   }
 }

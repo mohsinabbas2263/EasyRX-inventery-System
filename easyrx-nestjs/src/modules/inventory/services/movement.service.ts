@@ -10,6 +10,7 @@ import { Product } from '../../products/entities/product.entity';
 import { CreateMovementDto } from '../dto/create-movement.dto';
 import { CycleCountDto, AdjustmentDto } from '../dto/adjustment.dto';
 import { StockService } from './stock.service';
+import { TenantContextService } from '../../../common/services/tenant-context.service';
 
 @Injectable()
 export class MovementService {
@@ -19,13 +20,16 @@ export class MovementService {
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
     private stockService: StockService,
+    private tenantContext: TenantContextService,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async createMovement(
     dto: CreateMovementDto,
-    currentUserId: string,
   ): Promise<InventoryLedger[]> {
+    const currentUserId = this.tenantContext.userId;
+    if (!currentUserId) throw new Error('User context not found');
+
     // Validate movement type
     const inboundTypes = [
       MovementType.PURCHASE,
@@ -74,7 +78,7 @@ export class MovementService {
 
     // For SALE with medicines, use FEFO batch picking
     if (dto.movementType === MovementType.SALE && product.isMedicine) {
-      return this.createSaleWithFefo(dto, currentUserId);
+      return this.createSaleWithFefo(dto);
     }
 
     // Create single ledger entry
@@ -101,8 +105,10 @@ export class MovementService {
 
   private async createSaleWithFefo(
     dto: CreateMovementDto,
-    currentUserId: string,
   ): Promise<InventoryLedger[]> {
+    const currentUserId = this.tenantContext.userId;
+    if (!currentUserId) throw new Error('User context not found');
+
     const picks = await this.stockService.pickBatchesForSale(
       dto.branchId,
       dto.productId,
@@ -135,8 +141,10 @@ export class MovementService {
 
   async applyCycleCount(
     dto: CycleCountDto,
-    currentUserId: string,
   ): Promise<InventoryLedger | null> {
+    const currentUserId = this.tenantContext.userId;
+    if (!currentUserId) throw new Error('User context not found');
+
     const currentStock = await this.getCurrentStock(
       dto.branchId,
       dto.productId,
@@ -164,23 +172,18 @@ export class MovementService {
       allowNegativeStock: variance < 0, // Allow negative if shrinkage
     };
 
-    if (variance > 0) {
-      adjustmentDto.movementType = MovementType.ADJUSTMENT;
-    } else {
-      adjustmentDto.movementType = MovementType.ADJUSTMENT;
-    }
-
     const [adjustmentEntry] = await this.createMovement(
       adjustmentDto,
-      currentUserId,
     );
     return adjustmentEntry;
   }
 
   async createAdjustment(
     dto: AdjustmentDto,
-    currentUserId: string,
   ): Promise<InventoryLedger> {
+    const currentUserId = this.tenantContext.userId;
+    if (!currentUserId) throw new Error('User context not found');
+
     const movementDto: CreateMovementDto = {
       branchId: dto.branchId,
       productId: dto.productId,
@@ -192,7 +195,7 @@ export class MovementService {
       allowNegativeStock: false,
     };
 
-    const [entry] = await this.createMovement(movementDto, currentUserId);
+    const [entry] = await this.createMovement(movementDto);
     return entry;
   }
 

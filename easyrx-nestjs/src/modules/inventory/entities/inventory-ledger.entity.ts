@@ -46,6 +46,9 @@ export class InventoryLedger {
   @Column({ name: 'branch_id', type: 'uuid' })
   branchId!: string;
 
+  @Column({ name: 'company_id', type: 'uuid', nullable: true })
+  companyId!: string;
+
   @Column({ name: 'product_id', type: 'uuid' })
   productId!: string;
 

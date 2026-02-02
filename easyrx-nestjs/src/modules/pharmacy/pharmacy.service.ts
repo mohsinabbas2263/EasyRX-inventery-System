@@ -58,8 +58,14 @@ export class PharmacyService {
   // --- Prescriptions ---
   async createPrescription(
     dto: CreatePrescriptionDto,
-    userId: string,
   ): Promise<Prescription> {
+    const userId = this.tenantContext.userId;
+    const companyId = this.tenantContext.companyId;
+
+    if (!userId || !companyId) {
+      throw new Error('User or Company context not found');
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -68,6 +74,8 @@ export class PharmacyService {
       const { lines, ...prescriptionData } = dto;
       const prescription = this.prescriptionRepository.create({
         ...prescriptionData,
+        companyId,
+        branchId: this.tenantContext.branchId!,
         prescriptionDate: new Date(dto.prescriptionDate),
         createdBy: userId,
         status: dto.status || 'PENDING',

@@ -16,6 +16,9 @@ export class InventoryConfig {
   @Column({ type: 'uuid' })
   branchId: string;
 
+  @Column({ type: 'uuid', nullable: true })
+  companyId: string;
+
   @Column({ type: 'uuid' })
   productId: string;
 

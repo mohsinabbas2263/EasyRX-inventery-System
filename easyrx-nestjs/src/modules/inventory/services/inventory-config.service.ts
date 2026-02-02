@@ -6,17 +6,26 @@ import {
   InventoryConfigDto,
   QueryInventoryConfigDto,
 } from '../dto/inventory-config.dto';
+import { TenantContextService } from '../../../common/services/tenant-context.service';
 
 @Injectable()
 export class InventoryConfigService {
   constructor(
     @InjectRepository(InventoryConfig)
     private configRepository: Repository<InventoryConfig>,
-  ) {}
+    private tenantContext: TenantContextService,
+  ) { }
 
   async create(dto: InventoryConfigDto): Promise<InventoryConfig> {
+    const companyId = this.tenantContext.companyId;
+    if (!companyId) throw new Error('Company context not found');
+
     const existing = await this.configRepository.findOne({
-      where: { branchId: dto.branchId, productId: dto.productId },
+      where: {
+        companyId,
+        branchId: dto.branchId,
+        productId: dto.productId
+      },
     });
 
     if (existing) {
@@ -27,26 +36,34 @@ export class InventoryConfigService {
       return this.configRepository.save(existing);
     }
 
-    const config = this.configRepository.create(dto);
+    const config = this.configRepository.create({
+      ...dto,
+      companyId,
+    });
     return this.configRepository.save(config);
   }
 
   async findAll(
     query: QueryInventoryConfigDto,
   ): Promise<{ data: InventoryConfig[]; total: number }> {
-    const qb = this.configRepository.createQueryBuilder();
+    const qb = this.configRepository.createQueryBuilder('config');
+    const companyId = this.tenantContext.companyId;
+
+    if (companyId) {
+      qb.andWhere('config.companyId = :companyId', { companyId });
+    }
 
     if (query.branchId) {
-      qb.andWhere('branchId = :branchId', { branchId: query.branchId });
+      qb.andWhere('config.branchId = :branchId', { branchId: query.branchId });
     }
 
     if (query.productId) {
-      qb.andWhere('productId = :productId', { productId: query.productId });
+      qb.andWhere('config.productId = :productId', { productId: query.productId });
     }
 
     const [data, total] = await qb
-      .take(query.limit)
-      .skip(query.offset)
+      .take(query.limit || 100)
+      .skip(query.offset || 0)
       .getManyAndCount();
 
     return { data, total };

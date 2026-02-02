@@ -48,6 +48,9 @@ export class SyncQueue {
   })
   idempotencyKey?: string;
 
+  @Column({ name: 'synced_at', type: 'timestamptz', nullable: true })
+  syncedAt?: Date;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

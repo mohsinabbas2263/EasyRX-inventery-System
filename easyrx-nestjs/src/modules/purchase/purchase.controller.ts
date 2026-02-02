@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   UseGuards,
-  Request as NestRequest,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PurchaseService } from './purchase.service';
@@ -16,48 +15,41 @@ import {
   RequirePermissions,
   PermissionCode,
 } from '../security/decorators/permissions.decorator';
-import { RequestWithUser } from '../../common/interfaces/request-with-user.interface';
 
 @ApiTags('purchase')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('purchase')
 export class PurchaseController {
-  constructor(private readonly purchaseService: PurchaseService) {}
+  constructor(private readonly purchaseService: PurchaseService) { }
 
   // --- Suppliers ---
   @Post('suppliers')
   @RequirePermissions(PermissionCode.SUPPLIER_MANAGE)
   @ApiOperation({ summary: 'Register a new supplier' })
-  createSupplier(
-    @Body() dto: CreateSupplierDto,
-    @NestRequest() req: RequestWithUser,
-  ) {
-    return this.purchaseService.createSupplier(dto, req.user.userId);
+  createSupplier(@Body() dto: CreateSupplierDto) {
+    return this.purchaseService.createSupplier(dto);
   }
 
   @Get('suppliers')
   @RequirePermissions(PermissionCode.SUPPLIER_MANAGE)
   @ApiOperation({ summary: 'Get all suppliers' })
-  findAllSuppliers(@NestRequest() req: RequestWithUser) {
-    return this.purchaseService.findAllSuppliers(req.user.companyId);
+  findAllSuppliers() {
+    return this.purchaseService.findAllSuppliers();
   }
 
   // --- Purchase Orders ---
   @Post('orders')
   @RequirePermissions(PermissionCode.PURCHASE_ORDER_MANAGE)
   @ApiOperation({ summary: 'Create a new purchase order' })
-  createPurchaseOrder(
-    @Body() dto: CreatePurchaseOrderDto,
-    @NestRequest() req: RequestWithUser,
-  ) {
-    return this.purchaseService.createPurchaseOrder(dto, req.user.userId);
+  createPurchaseOrder(@Body() dto: CreatePurchaseOrderDto) {
+    return this.purchaseService.createPurchaseOrder(dto);
   }
 
   @Get('orders')
   @RequirePermissions(PermissionCode.PURCHASE_ORDER_MANAGE)
   @ApiOperation({ summary: 'Get all purchase orders for the branch' })
-  findAllPurchaseOrders(@NestRequest() req: RequestWithUser) {
-    return this.purchaseService.findAllPurchaseOrders(req.user.branchId || '');
+  findAllPurchaseOrders() {
+    return this.purchaseService.findAllPurchaseOrders();
   }
 }

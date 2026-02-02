@@ -44,15 +44,11 @@ import { validate } from './config/env.validation';
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME', 'easyrx'),
         entities: ['dist/**/*.entity.js'],
-        synchronize: false, // Use migrations instead
-        logging: configService.get('DB_LOGGING', false),
+        synchronize: false,
+        logging: configService.get('NODE_ENV') === 'development' ? ['error', 'warn'] : false,
+        ssl: configService.get('DATABASE_SSL') === 'true' ? { rejectUnauthorized: false } : false,
       }),
     }),
-    // CacheModule.register({
-    //     isGlobal: true,
-    //     ttl: 5 * 60 * 1000, // 5 minutes default
-    //     max: 1000,
-    // }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -60,12 +56,12 @@ import { validate } from './config/env.validation';
         {
           name: 'short',
           ttl: configService.get<number>('THROTTLE_TTL_SHORT', 1000),
-          limit: configService.get<number>('THROTTLE_LIMIT_SHORT', 3),
+          limit: configService.get<number>('THROTTLE_LIMIT_SHORT', 10), // Increased for prod
         },
         {
           name: 'long',
           ttl: configService.get<number>('THROTTLE_TTL_LONG', 60000),
-          limit: configService.get<number>('THROTTLE_LIMIT_LONG', 100),
+          limit: configService.get<number>('THROTTLE_LIMIT_LONG', 1000), // Standard prod limit
         },
       ],
     }),

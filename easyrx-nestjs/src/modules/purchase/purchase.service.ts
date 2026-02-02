@@ -6,6 +6,7 @@ import { PurchaseOrder } from './entities/purchase-order.entity';
 import { PurchaseOrderLine } from './entities/purchase-order-line.entity';
 import { CreateSupplierDto } from './dto/supplier.dto';
 import { CreatePurchaseOrderDto } from './dto/purchase-order.dto';
+import { TenantContextService } from '../../common/services/tenant-context.service';
 
 @Injectable()
 export class PurchaseService {
@@ -14,32 +15,46 @@ export class PurchaseService {
     private readonly supplierRepository: Repository<Supplier>,
     @InjectRepository(PurchaseOrder)
     private readonly poRepository: Repository<PurchaseOrder>,
-    @InjectRepository(PurchaseOrderLine)
     private readonly poLineRepository: Repository<PurchaseOrderLine>,
+    private readonly tenantContext: TenantContextService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   // --- Suppliers ---
-  async createSupplier(
-    dto: CreateSupplierDto,
-    userId: string,
-  ): Promise<Supplier> {
+  async createSupplier(dto: CreateSupplierDto): Promise<Supplier> {
+    const userId = this.tenantContext.userId;
+    const companyId = this.tenantContext.companyId;
+
+    if (!userId || !companyId) {
+      throw new Error('User or Company context not found');
+    }
+
     const supplier = this.supplierRepository.create({
       ...dto,
+      companyId: companyId,
       createdBy: userId,
     });
     return await this.supplierRepository.save(supplier);
   }
 
-  async findAllSuppliers(companyId: string): Promise<Supplier[]> {
-    return await this.supplierRepository.find({ where: { companyId } });
+  async findAllSuppliers(): Promise<Supplier[]> {
+    return await this.supplierRepository.find({
+      where: { companyId: this.tenantContext.companyId }
+    });
   }
 
   // --- Purchase Orders ---
   async createPurchaseOrder(
     dto: CreatePurchaseOrderDto,
-    userId: string,
   ): Promise<PurchaseOrder> {
+    const userId = this.tenantContext.userId;
+    const companyId = this.tenantContext.companyId;
+    const branchId = this.tenantContext.branchId;
+
+    if (!userId || !companyId || !branchId) {
+      throw new Error('User, Company, or Branch context not found');
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -47,6 +62,8 @@ export class PurchaseService {
     try {
       const po = this.poRepository.create({
         ...dto,
+        companyId: companyId,
+        branchId: branchId,
         orderDate: new Date(dto.orderDate),
         expectedDeliveryDate: dto.expectedDeliveryDate
           ? new Date(dto.expectedDeliveryDate)
@@ -82,9 +99,9 @@ export class PurchaseService {
     }
   }
 
-  async findAllPurchaseOrders(branchId: string): Promise<PurchaseOrder[]> {
+  async findAllPurchaseOrders(): Promise<PurchaseOrder[]> {
     return await this.poRepository.find({
-      where: { branchId },
+      where: { branchId: this.tenantContext.branchId },
       relations: ['supplier'],
     });
   }

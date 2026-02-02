@@ -8,10 +8,7 @@ import {
   Query,
   Body,
   UseGuards,
-  Request as NestRequest,
-  BadRequestException,
 } from '@nestjs/common';
-import { RequestWithUser } from '../../../common/interfaces/request-with-user.interface';
 import { InventoryConfigService } from '../services/inventory-config.service';
 import {
   InventoryConfigDto,
@@ -24,31 +21,23 @@ import {
   PermissionCode,
 } from '../../security/decorators/permissions.decorator';
 import { AuditAction } from '../../security/decorators/audit.decorator';
+import { TenantContextService } from '../../../common/services/tenant-context.service';
 
 @Controller('api/v1/inventory/config')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ConfigController {
-  constructor(private configService: InventoryConfigService) {}
+  constructor(
+    private configService: InventoryConfigService,
+    private tenantContext: TenantContextService,
+  ) { }
 
   @Get()
   @RequirePermissions(PermissionCode.INVENTORY_ADJUST)
   @AuditAction('INVENTORY:CONFIG_LIST')
-  async getConfig(
-    @Query() query: QueryInventoryConfigDto,
-    @NestRequest() req: RequestWithUser,
-  ) {
-    if (
-      req.user.role !== 'HO_ADMIN' &&
-      query.branchId &&
-      query.branchId !== req.user.branchId
-    ) {
-      throw new BadRequestException('Unauthorized');
+  async getConfig(@Query() query: QueryInventoryConfigDto) {
+    if (!query.branchId && this.tenantContext.branchId) {
+      query.branchId = this.tenantContext.branchId;
     }
-
-    if (req.user.role !== 'HO_ADMIN') {
-      query.branchId = req.user.branchId || '';
-    }
-
     return this.configService.findAll(query);
   }
 
@@ -61,18 +50,10 @@ export class ConfigController {
   @Post()
   @RequirePermissions(PermissionCode.INVENTORY_ADJUST)
   @AuditAction('INVENTORY:CONFIG_CREATE')
-  async createConfig(
-    @Body() dto: InventoryConfigDto,
-    @NestRequest() req: RequestWithUser,
-  ) {
-    if (req.user.role !== 'HO_ADMIN' && dto.branchId !== req.user.branchId) {
-      throw new BadRequestException('Unauthorized');
+  async createConfig(@Body() dto: InventoryConfigDto) {
+    if (!dto.branchId && this.tenantContext.branchId) {
+      dto.branchId = this.tenantContext.branchId;
     }
-
-    if (req.user.role !== 'HO_ADMIN') {
-      dto.branchId = req.user.branchId || '';
-    }
-
     return this.configService.create(dto);
   }
 
@@ -82,34 +63,14 @@ export class ConfigController {
   async updateConfig(
     @Param('id') id: string,
     @Body() dto: Partial<InventoryConfigDto>,
-    @NestRequest() req: RequestWithUser,
   ) {
-    const existing = await this.configService.findOne(id);
-    if (
-      req.user.role !== 'HO_ADMIN' &&
-      existing.branchId !== req.user.branchId
-    ) {
-      throw new BadRequestException('Unauthorized');
-    }
-
     return this.configService.update(id, dto);
   }
 
   @Delete(':id')
   @RequirePermissions(PermissionCode.INVENTORY_ADJUST)
   @AuditAction('INVENTORY:CONFIG_DELETE')
-  async deleteConfig(
-    @Param('id') id: string,
-    @NestRequest() req: RequestWithUser,
-  ) {
-    const existing = await this.configService.findOne(id);
-    if (
-      req.user.role !== 'HO_ADMIN' &&
-      existing.branchId !== req.user.branchId
-    ) {
-      throw new BadRequestException('Unauthorized');
-    }
-
+  async deleteConfig(@Param('id') id: string) {
     await this.configService.delete(id);
     return { success: true };
   }

@@ -13,8 +13,8 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { SalesQueryDto } from './dto/sales-query.dto';
 import { BatchSelectionService } from '../inventory/services/batch-selection.service';
 import { StockLedgerService } from '../inventory/services/stock-ledger.service';
-import { User } from '../users/entities/user.entity';
 import { TenantContextService } from '../../common/services/tenant-context.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class SalesService {
@@ -29,7 +29,14 @@ export class SalesService {
     private readonly dataSource: DataSource,
   ) { }
 
-  async createSale(dto: CreateSaleDto, user: User): Promise<SalesInvoice> {
+  async createSale(dto: CreateSaleDto): Promise<SalesInvoice> {
+    const userId = this.tenantContext.userId;
+    const companyId = this.tenantContext.companyId;
+
+    if (!userId || !companyId) {
+      throw new Error('User or Company context not found');
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -37,7 +44,7 @@ export class SalesService {
     try {
       // 1. Create the Invoice header
       const invoice = this.invoiceRepository.create({
-        companyId: user.companyId,
+        companyId: companyId,
         branchId: dto.branchId,
         customerId: dto.customerId,
         saleDate: new Date(),
@@ -48,8 +55,7 @@ export class SalesService {
         grossTotal: 0,
         taxTotal: 0,
         netTotal: 0,
-        createdBy: user.userId,
-        localUuid: dto.localUuid,
+        localUuid: dto.localUuid || randomUUID(), // Ensure it has one for sync if not provided
       });
 
       const savedInvoice = await queryRunner.manager.save(invoice);
@@ -78,7 +84,7 @@ export class SalesService {
               qtyOut: allocation.quantity,
               qtyIn: 0,
               unitCost: 0, // Should come from batch
-              postedBy: user.userId,
+              postedBy: userId,
             },
           );
 

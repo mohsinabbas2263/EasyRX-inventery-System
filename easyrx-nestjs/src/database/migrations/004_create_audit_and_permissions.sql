@@ -35,6 +35,12 @@ CREATE TABLE IF NOT EXISTS user_permissions (
 CREATE INDEX IF NOT EXISTS idx_user_permissions_user ON user_permissions(user_id);
 
 -- Audit log immutability constraint
-ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY audit_logs_immutable ON audit_logs AS RESTRICTIVE FOR UPDATE USING (FALSE);
-CREATE POLICY audit_logs_no_delete ON audit_logs AS RESTRICTIVE FOR DELETE USING (FALSE);
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'audit_logs_immutable') THEN
+        CREATE POLICY audit_logs_immutable ON audit_logs AS RESTRICTIVE FOR UPDATE USING (FALSE);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'audit_logs_no_delete') THEN
+        CREATE POLICY audit_logs_no_delete ON audit_logs AS RESTRICTIVE FOR DELETE USING (FALSE);
+    END IF;
+END $$;
